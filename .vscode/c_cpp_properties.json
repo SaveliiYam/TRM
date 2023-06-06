@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${vcpkgRoot}/x64-windows/include",
+                "${vcpkgRoot}/x86-windows/include",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/arduino/hardware/avr/1.8.6/variants/robot_motor",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/MyButton",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/MyThermoCouple",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/MyRelay",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/**",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire/src",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/LiquidCrystal_I2C-master",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/GyverPID/src",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/esp32/hardware/esp32/1.0.6/libraries/EEPROM",
+                "C:/Users/savel/AppData/Local/Arduino15/packages/esp32/hardware/esp32/1.0.6/libraries/EEPROM/src",
+                "C:/Users/savel/OneDrive/Документы/Arduino/libraries/WiFiManager"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "E:\\ProgrammFiles\\LLVM\\bin\\clang.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "windows-clang-x64"
+        }
+    ],
+    "version": 4
+}
