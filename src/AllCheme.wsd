@@ -1,0 +1,59 @@
+@startuml AllCheme
+
+
+skinparam PackageStyle rectangle
+
+package Automatic {
+    struct temperaturePausesStruct{}
+    class TRM{}
+    class Server{}
+    class TemperatureProgramm{}
+    class TemperaturePauseCollector{}
+    class LCDScreen{}
+    struct Koefficients{}
+    class PIDRegulator{}
+    class GyverPID{}
+    class MyButton{}
+    class MyThermoCouple{}
+}
+
+package HTTPServer{
+    class Listener
+    class Session
+    interface RequestHandler
+}
+
+package request_handler{
+    class requestHandler
+}
+
+package App{
+    class WhatPeopleWant
+}
+package DataBase{}
+
+
+TRM --* PIDRegulator : Создает
+TRM --* LCDScreen : Создает
+TRM --* temperaturePausesStruct
+TemperaturePauseCollector --* temperaturePausesStruct
+TemperatureProgramm --* temperaturePausesStruct
+PIDRegulator --* Koefficients : Создает из EEprom
+PIDRegulator --* GyverPID : Создает для расчетов
+TRM--*MyButton : Создает
+TRM--*MyThermoCouple : Создает
+TRM--*TemperaturePauseCollector: Создает
+TemperatureProgramm *--TemperaturePauseCollector:Создает каждый раз при работе с паузами
+Server *-- TRM : Создает
+Listener..>Session
+Session..>RequestHandler
+request_handler..>RequestHandler
+request_handler..>App ::Выбор данных для отправки
+App..>Automatic
+Server..>HTTPServer ::Периодический опрос сервера
+App<-->DataBase
+
+
+
+
+@enduml
