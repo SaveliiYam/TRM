@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-template<class M, class N>
+template<typename M, typename N>
 struct Pair {
     M val_1;
     N val_2;
