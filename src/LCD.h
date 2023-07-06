@@ -14,26 +14,40 @@ public:
         lcd.setCursor(0,0);
     }
     void WriteOnLcdPause(const Pair<byte, uint16_t>& pause, const byte& numberPause);
-    void WriteTemperature(const byte& temperature);
+    void WriteTemperature(const float& temperature);
     void Clear(const byte& curs);
     const void ClearLcd(){lcd.clear();}
 };
 
 void LCD::WriteOnLcdPause(const Pair<byte, uint16_t>& pause, const byte& numberPause){
-    Clear(1);
-    Clear(2);
+    static byte temperatureOld;
+    static uint16_t timeOld;
+    static byte numberPauseOld;
+    if(numberPauseOld != numberPause){
+        numberPauseOld = numberPause;
+        Clear(1);
+    }
+    if(temperatureOld != pause.first() || timeOld != pause.second()){
+        temperatureOld = pause.first();
+        timeOld = pause.second();
+        Clear(2);
+    }
     lcd.setCursor(0, 1);
     lcd.print("Number pause: ");
-    lcd.print(numberPause);
+    lcd.print(numberPauseOld);
     lcd.setCursor(0, 2);
     lcd.print("NeedTemp");
-    lcd.print(pause.first());
+    lcd.print(temperatureOld);
     lcd.print(" Time: ");
-    lcd.print(pause.second());
+    lcd.print(timeOld);
 }
 
-void LCD::WriteTemperature(const byte& temperature){
-    Clear(0);
+void LCD::WriteTemperature(const float& temperature){
+    static float oldTemp;
+    if(oldTemp != temperature){
+        oldTemp = temperature;
+        Clear(0);
+    }
     lcd.setCursor(0,0);
     lcd.print("Temperature: ");
     lcd.print(temperature);
