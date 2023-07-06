@@ -11,6 +11,7 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     // numberButton.ini(nmbBtn);
     motorButton.ini(mtrBtn);
     termoCouple.ini(sckPin, csPin, soPin);
+    regulator.setLimits(powerMin, powerMax);
 }
 
 float TRM::getTemperature()
@@ -125,6 +126,7 @@ void TRM::settings()
                 case 1: // вкл/выкл wifi
                     while (1)
                     {
+                        WiFiConnect();
                     }
                     break;
                 case 2: // параметры по мощности (ok)
@@ -151,27 +153,28 @@ void TRM::settings()
                             {
                                 if (settingsButton.Clicked())
                                 {
+                                    regulator.setLimits(powerMin, powerMax);
                                     break;
                                 }
                                 if (upButton->Clicked() && j == 0)
                                 {
                                     powerMax++;
-                                    powerMax = constrain(powerMax, 0, 100);
+                                    powerMax = constrain(powerMax, 0, 255);
                                 }
                                 if (upButton->Clicked() && j == 1)
                                 {
                                     powerMin++;
-                                    powerMax = constrain(powerMax, 0, 100);
+                                    powerMax = constrain(powerMax, 0, 255);
                                 }
                                 if (downButton->Clicked() && j == 0)
                                 {
                                     powerMax--;
-                                    powerMax = constrain(powerMax, 0, 100);
+                                    powerMax = constrain(powerMax, 0, 255);
                                 }
                                 if (downButton->Clicked() && j == 1)
                                 {
                                     powerMin--;
-                                    powerMax = constrain(powerMax, 0, 100);
+                                    powerMax = constrain(powerMax, 0, 255);
                                 }
                             }
                             // надо сохранить все данные в EEprom

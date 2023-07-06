@@ -10,6 +10,7 @@
 #include <WiFi.h>
 #include <WiFiManager.h> //библиотека для подключения к wifi
 #include <strings_en.h> 
+#include "PIDRegulator.h"
 
 
 struct temperaturePausesStruct{ //30 byte + 10byte
@@ -38,6 +39,7 @@ private:
     void WiFiConnect(); //Подключение к wifi
     bool wifiOn = false;
     LCD lcd;
+    PIDRegulator regulator;
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& sckPin, const byte& csPin, const byte& soPin);
