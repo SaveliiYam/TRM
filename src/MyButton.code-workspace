@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../../MyButton"
+		},
+		{
+			"name": "MyThermoCouple",
+			"path": "../../MyThermoCouple"
+		},
+		{
+			"name": "TRM",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"deque": "cpp",
+			"string": "cpp",
+			"vector": "cpp"
+		}
+	}
+}

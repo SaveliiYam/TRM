@@ -3,6 +3,12 @@ struct temperaturePausesStruct{
     byte setpointTemperature[6];
     int16_t time[6];
 }
+
+class LCD{
+    LiquidCrystal_I2C lcd{0x27, 20, 4};
+    LCD();
+}
+
 class TRM{
     byte _upButton, _downButton, _numberButton, numberPause = 0, powerMax, powerMin;
     TemperaturePauseCollector collector;
@@ -17,7 +23,9 @@ class TRM{
     void enterTemperaturePauses();
     void settings();
     void main();
+    LCD lcd;
 }
+
 class TemperatureProgramm{
     temperaturePausesStruct _pausesStruct
     TemperatureProgramm(const temperaturePausesStruct& pauses)//создание объекта, хранящего только структуру
@@ -38,9 +46,6 @@ class TemperaturePauseCollector{
     temperaturePausesStruct getPause(const byte& numberProgramm)//получить программу полностью
 }
 
-class LCDScreen{
-
-}
 
 struct Koefficients{
     unsigned int P = 0
@@ -97,6 +102,7 @@ class MyThermoCouple{
     float readCelsius();
     float readFarenheit();
 }
+TRM--*LCD : создает
 TRM --* PIDRegulator : Создает
 TRM --* temperaturePausesStruct
 TemperaturePauseCollector --* temperaturePausesStruct

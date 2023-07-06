@@ -5,6 +5,7 @@
 #include "TemperatureProgramm.h"
 #include "TemperaturePausesCollector.h"
 #include "Pair.h"
+#include "LCD.h"
 #include <EEPROM.h>
 #include <WiFi.h>
 #include <WiFiManager.h> //библиотека для подключения к wifi
@@ -36,6 +37,7 @@ private:
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     void WiFiConnect(); //Подключение к wifi
     bool wifiOn = false;
+    LCD lcd;
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& sckPin, const byte& csPin, const byte& soPin);
