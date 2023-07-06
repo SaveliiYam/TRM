@@ -84,6 +84,7 @@ void TRM::settings()
         byte i = 0;
         while (1)
         {
+            lcd.settingsMainMenu(i);
             if (settingsButton.Clicked())
                 break;
             if (upButton->Clicked())
