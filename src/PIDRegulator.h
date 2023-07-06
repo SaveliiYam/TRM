@@ -1,7 +1,8 @@
 #pragma once
 #include <Arduino.h>
 #include <GyverPID.h>
-
+#include <PIDtuner.h>
+#include <EEPROM.h>
 
 struct Koefficients
 {
@@ -15,22 +16,26 @@ class PIDRegulator
 private:
     Koefficients koefficients;
     GyverPID regulator;
-    byte _setpointTemperature = 0;
+    PIDtuner tuner;
 
 public:
     PIDRegulator()
     { // Нужно из EEprom грузить коэффициенты и писать их в регулятор
-        regulator.Kp = koefficients.P;
-        regulator.Ki = koefficients.I;
-        regulator.Kd = koefficients.D;
-        //regulator.setDt(400);
+        enterPIDKoefficients(koefficients);
+        regulator.setDt(400);
         regulator.setDirection(NORMAL);
         regulator.setLimits(0, 255);
     }
+
+    //Надо каждый раз вводить лимиты
     void const setLimits(const byte &minValue, const byte &maxValue) { regulator.setLimits(minValue, maxValue); }
-    void const putTemperature(const byte &temperature) { _setpointTemperature = temperature; }
-    int getValuePID(const float& temperatureIsTermoCouple){
-        regulator.input = temperatureIsTermoCouple;
-        return regulator.getResult();
-    }
+    //Получить значение
+    int getValuePID(const float &temperatureNow);
+    //Надо вызывать перед каждым тюном
+    void tuneInitialization(const float &temperatureNeed);
+    //тюн
+    bool tunePID(const float &temperatureNow);
+    //вставить коэффициенты в регулятор
+    void enterPIDKoefficients(const Koefficients &koefficients);
 };
+
