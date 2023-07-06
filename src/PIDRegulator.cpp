@@ -1,14 +1,15 @@
 #include "PIDRegulator.h"
 
 int PIDRegulator::getValuePID(const float &temperatureNow)
-    {
-        regulator.input = temperatureNow;
-        return regulator.getResult();
-    }
-    void PIDRegulator::tuneInitialization(const float &temperatureNeed)
-    {
-        tuner.setParameters(NORMAL, temperatureNeed, 5, 5000, 2, 15000, 400);
-    }
+{
+    regulator.input = temperatureNow;
+    return regulator.getResult();
+}
+
+void PIDRegulator::tuneInitialization(const float &temperatureNeed)
+{
+    tuner.setParameters(NORMAL, temperatureNeed, 5, 5000, 2, 15000, 400);
+}
 
 void PIDRegulator::enterPIDKoefficients(const Koefficients &koefficients)
 {

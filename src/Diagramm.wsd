@@ -7,6 +7,10 @@ struct temperaturePausesStruct{
 class LCD{
     LiquidCrystal_I2C lcd{0x27, 20, 4};
     LCD();
+    void WriteOnLcdPause(const Pair<byte, uint16_t>& pause, const byte& numberPause);
+    void WriteTemperature(const byte& temperature);
+    void Clear(const byte& curs);
+    const void ClearLcd();
 }
 
 class TRM{
@@ -84,7 +88,7 @@ class GyverPID{
 class MyButton{
     byte _pin
     bool _flag = false
-    uint32_t _tmr = millis()
+    uint32_t _tmr = millis
     MyButton(byte pin)
     MyButton()
     void ini(byte pin)
@@ -95,8 +99,7 @@ class MyButton{
 class MyThermoCouple{
     byte _sck, _so, _cs;
     uint8_t spiread(void);
-    uint32_t _tmr = millis();
-    float temperature = 0;
+    uint32_t _tmr = millis;
     MyThermoCouple();
     void ini(byte SCK, byte CS, byte SO);
     float readCelsius();
@@ -109,7 +112,7 @@ TemperaturePauseCollector --* temperaturePausesStruct
 TemperatureProgramm --* temperaturePausesStruct
 PIDRegulator --* Koefficients : Создает из EEprom
 PIDRegulator --* GyverPID : Создает для расчетов
-TRM--*MyButton : Создает
+TRM--*MyButton : Создает (up, down, number, start/stop, motor)
 TRM--*MyThermoCouple : Создает
 TRM--*TemperaturePauseCollector: Создает
 TemperatureProgramm *--TemperaturePauseCollector:Создает каждый раз при работе с паузами
