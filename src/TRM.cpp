@@ -82,20 +82,22 @@ void TRM::settings()
         MyButton *upButton = new MyButton(_upButton);
         MyButton *downButton = new MyButton(_downButton);
         byte i = 0;
+        lcd.settingsMainMenu(i);
         while (1)
         {
-            lcd.settingsMainMenu(i);
             if (settingsButton.Clicked())
                 break;
             if (upButton->Clicked())
             {
                 i++;
                 i = constrain(i, 0, 4);
+                lcd.settingsMainMenu(i);
             } // Перемещение кнопками up down
             if (downButton->Clicked())
             {
                 i--;
                 i = constrain(i, 0, 4);
+                lcd.settingsMainMenu(i);
             }
             if (startStopButton.Clicked())
             {
@@ -125,9 +127,39 @@ void TRM::settings()
                     delete numberButton;
                     break;
                 case 1: // вкл/выкл wifi
+                    lcd.WiFi(wifiOn);
                     while (1)
                     {
-                        WiFiConnect();
+                        //lcd.WiFi(wifiOn);
+                        if (settingsButton.Clicked())
+                        {
+                            if(wifiOn){WiFiConnect();}
+                            break;
+                        }
+                        if (upButton->Clicked())
+                        {
+                            if (!wifiOn)
+                            {
+                                wifiOn = true;
+                            }
+                            else
+                            {
+                                wifiOn = false;
+                            }
+                            lcd.WiFi(wifiOn);
+                        }
+                        if (downButton->Clicked())
+                        {
+                            if (!wifiOn)
+                            {
+                                wifiOn = true;
+                            }
+                            else
+                            {
+                                wifiOn = false;
+                            }
+                            lcd.WiFi(wifiOn);
+                        }
                     }
                     break;
                 case 2: // параметры по мощности (ok)

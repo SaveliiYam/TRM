@@ -18,17 +18,37 @@ public:
         lcd.setCursor(0, 0);
         lcd.createChar(0, RightArrow);
     }
-    void Point(const byte& parametr);
+    void Point(const byte &parametr);
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
     void WriteTemperature(const float &temperature);
     void Clear(const byte &curs);
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
+    void WiFi(const bool &parametr);
 };
 
-void LCD::Point(const byte& parametr){
+void LCD::Point(const byte &parametr)
+{
     lcd.setCursor(0, parametr);
     lcd.print(char(0));
+}
+
+void LCD::WiFi(const bool &parametr)
+{
+    if (parametr)
+    {
+        Point(1);
+    }
+    else
+    {
+        Point(2);
+    }
+    lcd.setCursor(1, 0);
+    lcd.print("WiFi on/off");
+    lcd.setCursor(1, 1);
+    lcd.print("On");
+    lcd.setCursor(1, 2);
+    lcd.print("Off");
 }
 
 void LCD::settingsMainMenu(const byte &parametr)
