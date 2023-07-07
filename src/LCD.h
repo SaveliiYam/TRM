@@ -18,12 +18,18 @@ public:
         lcd.setCursor(0, 0);
         lcd.createChar(0, RightArrow);
     }
+    void Point(const byte& parametr);
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
     void WriteTemperature(const float &temperature);
     void Clear(const byte &curs);
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
 };
+
+void LCD::Point(const byte& parametr){
+    lcd.setCursor(0, parametr);
+    lcd.print(char(0));
+}
 
 void LCD::settingsMainMenu(const byte &parametr)
 {
@@ -32,8 +38,7 @@ void LCD::settingsMainMenu(const byte &parametr)
     {
         parametrOld = parametr;
         lcd.clear();
-        lcd.setCursor(0, parametrOld);
-        lcd.print(char(0));
+        Point(parametrOld);
         lcd.setCursor(1, 0);
         lcd.print("Pause settings");
         lcd.setCursor(1, 1);
