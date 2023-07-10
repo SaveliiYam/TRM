@@ -42,23 +42,20 @@ struct parametrs{
 class TRM
 {
 private:
-    byte _upButton, _downButton, _numberButton;
+    byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
     TemperaturePauseCollector collector;
     //MyButton downButton;
     //MyButton upButton;
-    MyButton settingsButton;
-    MyButton startStopButton;
+    MyButton settingsButton, startStopButton, motorButton;
     //MyButton numberButton;
-    MyButton motorButton;
     MyThermoCouple termoCouple;
-    byte numberPause = 0;
     byte checkButtonClicked();
     byte checkButtonPressed();
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     void WiFiConnect(); //Подключение к wifi
-    bool wifiOn = false;
+    bool wifiOn = false, _motorState = false;
     LCD lcd;
     PIDRegulator regulator;
     void saveParametrs();
@@ -66,13 +63,14 @@ private:
     void baseParametrs();
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
-        const byte& nmbBtn, const byte& mtrBtn, const byte& sckPin, const byte& csPin, const byte& soPin);
+        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
     float getTemperature();
     void chooseNumberPause();
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
     void main_programm();
+    void motorOn();
 };
 
 

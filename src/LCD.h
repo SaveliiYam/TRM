@@ -31,6 +31,7 @@ public:
     void TimeConcrete(const bool &parametr, const bool &value);
     void NumberProg(byte numberProgramm);
     void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
+    void BaseSettings(const bool& parametr);
 };
 
 void LCD::ClearAll() { lcd.clear(); }
@@ -39,6 +40,19 @@ void LCD::Point(const byte &parametr)
 {
     lcd.setCursor(0, parametr);
     lcd.print(char(0));
+}
+
+void LCD::BaseSettings(const bool& parametr){
+    if(parametr)
+        Point(2);
+    else
+        Point(1);
+    lcd.setCursor(0, 0);
+    lcd.print("Return base setting");
+    lcd.setCursor(1, 1);
+    lcd.print("No");
+    lcd.setCursor(1, 2);
+    lcd.print("Yes");
 }
 
 void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time)

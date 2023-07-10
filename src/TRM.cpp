@@ -1,8 +1,8 @@
 #include "TRM.h"
 
 TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
-         const byte &nmbBtn, const byte &mtrBtn, const byte &sckPin, const byte &csPin, const byte &soPin)
-    : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn)
+         const byte &nmbBtn, const byte &mtrBtn, const byte& mtrPin , const byte &sckPin, const byte &csPin, const byte &soPin)
+    : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
 {
     // downButton.ini(dwnBtn);
     // upButton.ini(upBtn);
@@ -10,6 +10,10 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     startStopButton.ini(strtBtn);
     // numberButton.ini(nmbBtn);
     motorButton.ini(mtrBtn);
+    
+    pinMode(_motorPin, OUTPUT);
+    digitalWrite(_motorPin, _motorState);
+
     termoCouple.ini(sckPin, csPin, soPin);
     regulator.setLimits(powerMin, powerMax);
 }
@@ -97,7 +101,25 @@ void TRM::settings()
         lcd.ClearAll();
         lcd.settingsMainMenu(i);
         while (1)
-        {
+        {   
+            //Чтобы зайти в базовые настройки надо зажать клавищу с мотором
+            if(motorButton.Pressed()){
+                bool parametr = false;
+                lcd.ClearAll();
+                lcd.BaseSettings(parametr);
+                while(1){
+                    if(upButton->Clicked() || downButton->Clicked()){
+                        parametr = true ? false : true;
+                        lcd.ClearAll();
+                        lcd.BaseSettings(parametr);
+                    }
+                    if(settingsButton.Clicked()){
+                        if(parametr)
+                            baseParametrs();
+                        break;
+                    }
+                }
+            }
             if (settingsButton.Clicked())
                 break;
             if (upButton->Clicked())
@@ -311,24 +333,6 @@ void TRM::settings()
     }
 }
 
-void TRM::saveParametrs(){
-    parametrs param{timeSet, timeDelay, powerMax, powerMin};
-    EEPROM.put(250, param);
-}
-void TRM::loadParametrs(){
-    parametrs param;
-    EEPROM.get(250, param);
-    timeSet = param._timeSet;
-    timeDelay = param._timeDelay;
-    powerMax = param._powerMax;
-    powerMin = param._powerMin;
-}
-void TRM::baseParametrs(){
-    parametrs param;
-    EEPROM.put(250, param);
-}
-
-
 
 void TRM::main_programm()
 {
@@ -351,3 +355,27 @@ void TRM::WiFiConnect()
         wifiOn = true;
     }
 }
+
+void TRM::motorOn(){
+    if(motorButton.Pressed()){
+
+    }
+}
+
+void TRM::saveParametrs(){
+    parametrs param{timeSet, timeDelay, powerMax, powerMin};
+    EEPROM.put(250, param);
+}
+void TRM::loadParametrs(){
+    parametrs param;
+    EEPROM.get(250, param);
+    timeSet = param._timeSet;
+    timeDelay = param._timeDelay;
+    powerMax = param._powerMax;
+    powerMin = param._powerMin;
+}
+void TRM::baseParametrs(){
+    parametrs param;
+    EEPROM.put(250, param);
+}
+

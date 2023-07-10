@@ -4,30 +4,63 @@ struct temperaturePausesStruct{
     int16_t time[6];
 }
 
+struct parametrs{
+    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin);
+    parametrs(){}
+    bool _timeSet = false;
+    bool _timeDelay = false;
+    byte _powerMax = 255, _powerMin = 0;
+
+}
+
 class LCD{
     LiquidCrystal_I2C lcd{0x27, 20, 4};
     LCD();
-    void WriteOnLcdPause(const Pair<byte, uint16_t>& pause, const byte& numberPause);
-    void WriteTemperature(const byte& temperature);
-    void Clear(const byte& curs);
-    const void ClearLcd();
+    void Point(const byte &parametr);
+    void ClearAll();
+    void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
+    void WriteTemperature(const float &temperature);
+    void Clear(const byte &curs);
+    const void ClearLcd() { lcd.clear(); }
+    void settingsMainMenu(const byte &parametr);
+    void WiFi(const bool &parametr);
+    void PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit);
+    void TimeSettings(const bool &parametr);
+    void TimeConcrete(const bool &parametr, const bool &value);
+    void NumberProg(byte numberProgramm);
+    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
+    void BaseSettings(const bool& parametr);
 }
 
 class TRM{
-    byte _upButton, _downButton, _numberButton, numberPause = 0, powerMax, powerMin;
+    byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
     TemperaturePauseCollector collector;
+    //MyButton downButton;
+    //MyButton upButton;
     MyButton settingsButton, startStopButton, motorButton;
+    //MyButton numberButton;
     MyThermoCouple termoCouple;
-    bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom
+    byte checkButtonClicked();
+    byte checkButtonPressed();
+    bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
+    bool timeDelay = false;//переменная связанная с отложенным временем
+    byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
+    void WiFiConnect(); //Подключение к wifi
+    bool wifiOn = false, _motorState = false;
+    LCD lcd;
+    PIDRegulator regulator;
+    void saveParametrs();
+    void loadParametrs();
+    void baseParametrs();
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
-    const byte& nmbBtn, const byte& mtrBtn, const byte& sckPin, const byte& csPin, const byte& soPin);
+        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
     float getTemperature();
     void chooseNumberPause();
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
-    void main();
-    LCD lcd;
+    void main_programm();
+    void motorOn();
 }
 
 class TemperatureProgramm{
@@ -37,6 +70,7 @@ class TemperatureProgramm{
     Pair<byte, uint16_t> readPause(const byte& pause)//получить паузу из программы
     void writePauses(char temp[6], uint16_t times[6])//записать программу, передав ей массивы(отказ-ся)
     void writePauses(const temperaturePausesStruct& structWrite)//запись программы ч-з стр-ру
+    void writePauses(const byte& adress, const temperaturePausesStruct& structWrite);//запись с дальнейшим сохранением
     temperaturePausesStruct getPauseAll()//получить программу
     void savePauses(const int& adress)//сохранить программу в ячейку
 }
@@ -107,7 +141,7 @@ class MyThermoCouple{
 }
 TRM--*LCD : создает
 TRM --* PIDRegulator : Создает
-TRM --* temperaturePausesStruct
+TRM --* parametrs : используется для сохранения
 TemperaturePauseCollector --* temperaturePausesStruct
 TemperatureProgramm --* temperaturePausesStruct
 PIDRegulator --* Koefficients : Создает из EEprom
