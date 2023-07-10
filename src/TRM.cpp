@@ -149,10 +149,13 @@ void TRM::settings()
                     lcd.WiFi(wifiOn);
                     while (1)
                     {
-                        //lcd.WiFi(wifiOn);
+                        // lcd.WiFi(wifiOn);
                         if (settingsButton.Clicked())
                         {
-                            if(wifiOn){WiFiConnect();}
+                            if (wifiOn)
+                            {
+                                WiFiConnect();
+                            }
                             break;
                         }
                         if (upButton->Clicked())
@@ -189,7 +192,7 @@ void TRM::settings()
                     lcd.PowerLimits(parametr, powerMin, powerMax);
                     while (1)
                     {
-                        //Выбор что изменять
+                        // Выбор что изменять
                         if (settingsButton.Clicked())
                         {
                             break;
@@ -206,7 +209,7 @@ void TRM::settings()
                             lcd.ClearAll();
                             lcd.PowerLimits(parametr, powerMin, powerMax);
                         }
-                        //Меняем значение
+                        // Меняем значение
                         if (startStopButton.Clicked())
                         {
                             while (1)
@@ -253,26 +256,43 @@ void TRM::settings()
                     bool parametr = false;
                     lcd.ClearAll();
                     lcd.TimeSettings(parametr);
-                    while(1){
-                        if(settingsButton.Clicked()){break;}
+                    while (1)
+                    {
+                        if (settingsButton.Clicked())
+                        {
+                            break;
+                        }
                         if (upButton->Clicked() || downButton->Clicked())
                         {
                             parametr = true ? false : true;
                             lcd.ClearAll();
                             lcd.TimeSettings(parametr);
                         }
-                        if(startStopButton.Clicked()){
+                        if (startStopButton.Clicked())
+                        {
                             lcd.ClearAll();
-                            if(parametr){lcd.TimeConcrete(parametr, timeSet);}
-                            else{lcd.TimeConcrete(parametr, timeDelay);}
-                            while(1){
-                                if(settingsButton.Clicked()){break;}
-                                if(upButton->Clicked() || downButton->Clicked() && parametr){
+                            if (parametr)
+                            {
+                                lcd.TimeConcrete(parametr, timeSet);
+                            }
+                            else
+                            {
+                                lcd.TimeConcrete(parametr, timeDelay);
+                            }
+                            while (1)
+                            {
+                                if (settingsButton.Clicked())
+                                {
+                                    break;
+                                }
+                                if (upButton->Clicked() || downButton->Clicked() && parametr)
+                                {
                                     timeSet = true ? false : true;
                                     lcd.ClearAll();
                                     lcd.TimeConcrete(parametr, timeSet);
                                 }
-                                if(upButton->Clicked() || downButton->Clicked() && !parametr){
+                                if (upButton->Clicked() || downButton->Clicked() && !parametr)
+                                {
                                     timeSet = true ? false : true;
                                     lcd.ClearAll();
                                     lcd.TimeConcrete(parametr, timeDelay);

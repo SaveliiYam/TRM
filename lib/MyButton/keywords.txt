@@ -1,0 +1,3 @@
+MyButton    KEYWORD1
+Clicked KEYWORD2
+Pressed KEYWORD2

@@ -1,0 +1,4 @@
+MyThermoCouple  KEYWORD1
+
+ReadCelsius KEYWORD2
+ReadFahrenheit  KEYWORD2
