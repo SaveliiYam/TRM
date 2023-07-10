@@ -45,27 +45,39 @@ void TRM::enterTemperaturePauses()
     {
         byte temp1 = pauseEnter.setpointTemperature[i];
         uint16_t time1 = pauseEnter.time[i];
+        lcd.ClearAll();
+        lcd.EnterTemperaturePause(numberPause, i, false, temp1, time1);
         while (!startStopButton.Clicked())
         { // ввод температуры
             if (downButton->Clicked())
             {
                 temp1--;
+                lcd.ClearAll();
+                lcd.EnterTemperaturePause(numberPause, i, false, temp1, time1);
             }
             if (upButton->Clicked())
             {
                 temp1++;
+                lcd.ClearAll();
+                lcd.EnterTemperaturePause(numberPause, i, false, temp1, time1);
             }
             temp1 = constrain(temp1, 0, 255);
         }
+        lcd.ClearAll();
+        lcd.EnterTemperaturePause(numberPause, i, true, temp1, time1);
         while (!startStopButton.Clicked())
         { // ввод времени
             if (downButton->Clicked())
             {
                 time1--;
+                lcd.ClearAll();
+                lcd.EnterTemperaturePause(numberPause, i, true, temp1, time1);
             }
             if (upButton->Clicked())
             {
                 time1++;
+                lcd.ClearAll();
+                lcd.EnterTemperaturePause(numberPause, i, true, temp1, time1);
             }
         }
         pauseEnter.setpointTemperature[i] = temp1;
@@ -108,6 +120,8 @@ void TRM::settings()
                 {
                 case 0: // Настройки паузы (ok)
                     MyButton *numberButton = new MyButton(_numberButton);
+                    lcd.ClearAll();
+                    lcd.NumberProg(numberPause);
                     while (1)
                     { // сначала выбираем номер паузы, затем вводим паузу
                         if (settingsButton.Pressed())
@@ -117,10 +131,11 @@ void TRM::settings()
                         if (numberButton->Clicked())
                         {
                             numberPause++;
-                            if (numberPause == 3)
+                            if (numberPause == 2)
                             {
                                 numberPause = 0;
                             }
+                            lcd.NumberProg(numberPause);
                         }
                         if (startStopButton.Clicked())
                         {

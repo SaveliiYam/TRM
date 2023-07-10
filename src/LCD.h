@@ -10,6 +10,7 @@ class LCD
 private:
     LiquidCrystal_I2C lcd{0x27, 20, 4};
     void Point(const byte &parametr);
+
 public:
     LCD()
     {
@@ -25,12 +26,14 @@ public:
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
     void WiFi(const bool &parametr);
-    void PowerLimits(const bool& parametr, const byte& minLimit, const byte& maxLimit);
-    void TimeSettings(const bool& parametr);
-    void TimeConcrete(const bool& parametr, const bool& value);
+    void PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit);
+    void TimeSettings(const bool &parametr);
+    void TimeConcrete(const bool &parametr, const bool &value);
+    void NumberProg(byte numberProgramm);
+    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
 };
 
-void LCD::ClearAll(){lcd.clear();}
+void LCD::ClearAll() { lcd.clear(); }
 
 void LCD::Point(const byte &parametr)
 {
@@ -38,12 +41,43 @@ void LCD::Point(const byte &parametr)
     lcd.print(char(0));
 }
 
-void LCD::TimeConcrete(const bool& parametr, const bool& value){
-    if(parametr){
-        if(value){
+void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time)
+{
+    NumberProg(numberProgramm);
+    lcd.setCursor(0, 1);
+    lcd.print("Step: ");
+    lcd.print(step);
+    if (!parametr)
+        Point(2);
+    else
+        Point(3);
+    lcd.setCursor(1, 2);
+    lcd.print("Setpoint temp: ");
+    lcd.print(temperature);
+    lcd.setCursor(1, 3);
+    lcd.print("Setpoint time: ");
+    lcd.print(time);
+}
+
+void LCD::NumberProg(byte numberProgramm)
+{
+    lcd.setCursor(0, 0);
+    lcd.print("Number programm: ");
+    lcd.print(++numberProgramm);
+}
+
+void LCD::TimeConcrete(const bool &parametr, const bool &value)
+{
+    if (parametr)
+    {
+        if (value)
+        {
             Point(1);
         }
-        else{Point(2);}
+        else
+        {
+            Point(2);
+        }
         lcd.setCursor(1, 0);
         lcd.print("min/sec");
         lcd.setCursor(1, 1);
@@ -51,11 +85,16 @@ void LCD::TimeConcrete(const bool& parametr, const bool& value){
         lcd.setCursor(1, 2);
         lcd.print("min");
     }
-    else{
-        if(value){
+    else
+    {
+        if (value)
+        {
             Point(1);
         }
-        else{Point(2);}
+        else
+        {
+            Point(2);
+        }
         lcd.setCursor(1, 0);
         lcd.print("time delay");
         lcd.setCursor(1, 1);
@@ -65,11 +104,16 @@ void LCD::TimeConcrete(const bool& parametr, const bool& value){
     }
 }
 
-void LCD::TimeSettings(const bool& parametr){
-    if(parametr){
+void LCD::TimeSettings(const bool &parametr)
+{
+    if (parametr)
+    {
         Point(1);
     }
-    else{Point(2);}
+    else
+    {
+        Point(2);
+    }
     lcd.setCursor(1, 0);
     lcd.print("Time Settings");
     lcd.setCursor(1, 1);
@@ -78,11 +122,14 @@ void LCD::TimeSettings(const bool& parametr){
     lcd.print("delay time");
 }
 
-void LCD::PowerLimits(const bool& parametr, const byte& minLimit, const byte& maxLimit){
-    if(parametr){
+void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit)
+{
+    if (parametr)
+    {
         Point(1);
     }
-    else{
+    else
+    {
         Point(2);
     }
     lcd.setCursor(1, 0);
