@@ -311,6 +311,25 @@ void TRM::settings()
     }
 }
 
+void TRM::saveParametrs(){
+    parametrs param{timeSet, timeDelay, powerMax, powerMin};
+    EEPROM.put(250, param);
+}
+void TRM::loadParametrs(){
+    parametrs param;
+    EEPROM.get(250, param);
+    timeSet = param._timeSet;
+    timeDelay = param._timeDelay;
+    powerMax = param._powerMax;
+    powerMin = param._powerMin;
+}
+void TRM::baseParametrs(){
+    parametrs param;
+    EEPROM.put(250, param);
+}
+
+
+
 void TRM::main_programm()
 {
     settings();

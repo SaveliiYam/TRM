@@ -40,6 +40,8 @@ private:
     bool wifiOn = false;
     LCD lcd;
     PIDRegulator regulator;
+    void saveParametrs();
+    void loadParametrs();
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& sckPin, const byte& csPin, const byte& soPin);

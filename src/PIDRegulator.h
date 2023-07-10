@@ -6,9 +6,9 @@
 
 struct Koefficients
 {
-    unsigned int P = 0;
-    unsigned int I = 0;
-    unsigned int D = 0;
+    float P = 0;
+    float I = 0;
+    float D = 0;
 };
 
 class PIDRegulator
@@ -37,5 +37,13 @@ public:
     bool tunePID(const float &temperatureNow);
     //вставить коэффициенты в регулятор
     void enterPIDKoefficients(const Koefficients &koefficients);
+    //
+    void loadKoefficients(){EEPROM.get(200, koefficients);}
+    void saveKoefficients(){EEPROM.put(200, koefficients);}
+    void baseKoefficients(){
+        Koefficients base;
+        koefficients = base;
+        saveKoefficients();
+    }
 };
 

@@ -25,7 +25,7 @@ public:
     //Чтение структуры из EEprom
     TemperatureProgramm(const byte& adress){//надо брать номер ячейки и считывать с него
         EEPROM.get(adress, _pausesStruct);
-        savePauses(adress);
+        //savePauses(adress);
     }
     
     ~TemperatureProgramm(){}
@@ -42,6 +42,11 @@ public:
 
     void writePauses(const temperaturePausesStruct& structWrite){ //запись паузы, затем надо сохранить
         _pausesStruct = structWrite;
+    }
+
+    void writePauses(const byte& adress, const temperaturePausesStruct& structWrite){ //запись паузы с дальнейшим сохранением
+        _pausesStruct = structWrite;
+        savePauses(adress);
     }
 
     temperaturePausesStruct getPauseAll(){//считываем структуры с EEprom

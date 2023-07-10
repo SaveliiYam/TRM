@@ -17,7 +17,7 @@ public:
 
     void writePauses(const byte& numberProgramm, const temperaturePausesStruct& pause){//записываем паузу целиком
         TemperatureProgramm* pauseClass = new TemperatureProgramm(_adress[numberProgramm]);//Создали паузу по адрессу
-        pauseClass->writePauses(pause);
+        pauseClass->writePauses(_adress[numberProgramm], pause);
         delete pauseClass;
     }
     Pair<byte, uint16_t> readPause(const byte& numberProgramm, const byte& numberPause){ //получаем одну паузу
