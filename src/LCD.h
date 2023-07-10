@@ -9,7 +9,7 @@ class LCD
 {
 private:
     LiquidCrystal_I2C lcd{0x27, 20, 4};
-
+    void Point(const byte &parametr);
 public:
     LCD()
     {
@@ -18,19 +18,81 @@ public:
         lcd.setCursor(0, 0);
         lcd.createChar(0, RightArrow);
     }
-    void Point(const byte &parametr);
+    void ClearAll();
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
     void WriteTemperature(const float &temperature);
     void Clear(const byte &curs);
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
     void WiFi(const bool &parametr);
+    void PowerLimits(const bool& parametr, const byte& minLimit, const byte& maxLimit);
+    void TimeSettings(const bool& parametr);
+    void TimeConcrete(const bool& parametr, const bool& value);
 };
+
+void LCD::ClearAll(){lcd.clear();}
 
 void LCD::Point(const byte &parametr)
 {
     lcd.setCursor(0, parametr);
     lcd.print(char(0));
+}
+
+void LCD::TimeConcrete(const bool& parametr, const bool& value){
+    if(parametr){
+        if(value){
+            Point(1);
+        }
+        else{Point(2);}
+        lcd.setCursor(1, 0);
+        lcd.print("min/sec");
+        lcd.setCursor(1, 1);
+        lcd.print("sec");
+        lcd.setCursor(1, 2);
+        lcd.print("min");
+    }
+    else{
+        if(value){
+            Point(1);
+        }
+        else{Point(2);}
+        lcd.setCursor(1, 0);
+        lcd.print("time delay");
+        lcd.setCursor(1, 1);
+        lcd.print("no delay");
+        lcd.setCursor(1, 2);
+        lcd.print("delay");
+    }
+}
+
+void LCD::TimeSettings(const bool& parametr){
+    if(parametr){
+        Point(1);
+    }
+    else{Point(2);}
+    lcd.setCursor(1, 0);
+    lcd.print("Time Settings");
+    lcd.setCursor(1, 1);
+    lcd.print("min/sec");
+    lcd.setCursor(1, 2);
+    lcd.print("delay time");
+}
+
+void LCD::PowerLimits(const bool& parametr, const byte& minLimit, const byte& maxLimit){
+    if(parametr){
+        Point(1);
+    }
+    else{
+        Point(2);
+    }
+    lcd.setCursor(1, 0);
+    lcd.print("Power limits");
+    lcd.setCursor(1, 1);
+    lcd.print("minLimit: ");
+    lcd.print(minLimit);
+    lcd.setCursor(1, 2);
+    lcd.print("maxLimit: ");
+    lcd.print(maxLimit);
 }
 
 void LCD::WiFi(const bool &parametr)

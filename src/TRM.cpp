@@ -82,6 +82,7 @@ void TRM::settings()
         MyButton *upButton = new MyButton(_upButton);
         MyButton *downButton = new MyButton(_downButton);
         byte i = 0;
+        lcd.ClearAll();
         lcd.settingsMainMenu(i);
         while (1)
         {
@@ -90,13 +91,15 @@ void TRM::settings()
             if (upButton->Clicked())
             {
                 i++;
-                i = constrain(i, 0, 4);
+                i = constrain(i, 0, 3);
+                lcd.ClearAll();
                 lcd.settingsMainMenu(i);
             } // Перемещение кнопками up down
             if (downButton->Clicked())
             {
                 i--;
-                i = constrain(i, 0, 4);
+                i = constrain(i, 0, 3);
+                lcd.ClearAll();
                 lcd.settingsMainMenu(i);
             }
             if (startStopButton.Clicked())
@@ -127,6 +130,7 @@ void TRM::settings()
                     delete numberButton;
                     break;
                 case 1: // вкл/выкл wifi
+                    lcd.ClearAll();
                     lcd.WiFi(wifiOn);
                     while (1)
                     {
@@ -146,6 +150,7 @@ void TRM::settings()
                             {
                                 wifiOn = false;
                             }
+                            lcd.ClearAll();
                             lcd.WiFi(wifiOn);
                         }
                         if (downButton->Clicked())
@@ -158,28 +163,35 @@ void TRM::settings()
                             {
                                 wifiOn = false;
                             }
+                            lcd.ClearAll();
                             lcd.WiFi(wifiOn);
                         }
                     }
                     break;
                 case 2: // параметры по мощности (ok)
-                    byte j = 0;
+                    bool parametr = false;
+                    lcd.ClearAll();
+                    lcd.PowerLimits(parametr, powerMin, powerMax);
                     while (1)
                     {
+                        //Выбор что изменять
                         if (settingsButton.Clicked())
                         {
                             break;
                         }
                         if (upButton->Clicked())
                         {
-                            j++;
-                            j = constrain(j, 0, 1);
+                            parametr = true ? false : true;
+                            lcd.ClearAll();
+                            lcd.PowerLimits(parametr, powerMin, powerMax);
                         }
                         if (downButton->Clicked())
                         {
-                            j--;
-                            j = constrain(j, 0, 1);
+                            parametr = true ? false : true;
+                            lcd.ClearAll();
+                            lcd.PowerLimits(parametr, powerMin, powerMax);
                         }
+                        //Меняем значение
                         if (startStopButton.Clicked())
                         {
                             while (1)
@@ -189,25 +201,33 @@ void TRM::settings()
                                     regulator.setLimits(powerMin, powerMax);
                                     break;
                                 }
-                                if (upButton->Clicked() && j == 0)
+                                if (upButton->Clicked() && parametr)
                                 {
                                     powerMax++;
                                     powerMax = constrain(powerMax, 0, 255);
+                                    lcd.ClearAll();
+                                    lcd.PowerLimits(parametr, powerMin, powerMax);
                                 }
-                                if (upButton->Clicked() && j == 1)
+                                if (upButton->Clicked() && !parametr)
                                 {
                                     powerMin++;
-                                    powerMax = constrain(powerMax, 0, 255);
+                                    powerMax = constrain(powerMin, 0, 255);
+                                    lcd.ClearAll();
+                                    lcd.PowerLimits(parametr, powerMin, powerMax);
                                 }
-                                if (downButton->Clicked() && j == 0)
+                                if (downButton->Clicked() && parametr)
                                 {
                                     powerMax--;
                                     powerMax = constrain(powerMax, 0, 255);
+                                    lcd.ClearAll();
+                                    lcd.PowerLimits(parametr, powerMin, powerMax);
                                 }
-                                if (downButton->Clicked() && j == 1)
+                                if (downButton->Clicked() && parametr)
                                 {
                                     powerMin--;
-                                    powerMax = constrain(powerMax, 0, 255);
+                                    powerMax = constrain(powerMin, 0, 255);
+                                    lcd.ClearAll();
+                                    lcd.PowerLimits(parametr, powerMin, powerMax);
                                 }
                             }
                             // надо сохранить все данные в EEprom
@@ -215,67 +235,38 @@ void TRM::settings()
                     }
                     break;
                 case 3: // выбор времени sec/min (ok!)
-                    while (1)
-                    {
-                        if (settingsButton.Pressed())
+                    bool parametr = false;
+                    lcd.ClearAll();
+                    lcd.TimeSettings(parametr);
+                    while(1){
+                        if(settingsButton.Clicked()){break;}
+                        if (upButton->Clicked() || downButton->Clicked())
                         {
-                            break;
+                            parametr = true ? false : true;
+                            lcd.ClearAll();
+                            lcd.TimeSettings(parametr);
                         }
-                        if (upButton->Clicked())
-                        {
-                            if (timeSet)
-                            {
-                                timeSet = false;
-                            }
-                            else
-                            {
-                                timeSet = true;
-                            }
-                        }
-                        if (downButton->Clicked())
-                        {
-                            if (!timeSet)
-                            {
-                                timeSet = true;
-                            }
-                            else
-                            {
-                                timeSet = false;
+                        if(startStopButton.Clicked()){
+                            lcd.ClearAll();
+                            if(parametr){lcd.TimeConcrete(parametr, timeSet);}
+                            else{lcd.TimeConcrete(parametr, timeDelay);}
+                            while(1){
+                                if(settingsButton.Clicked()){break;}
+                                if(upButton->Clicked() || downButton->Clicked() && parametr){
+                                    timeSet = true ? false : true;
+                                    lcd.ClearAll();
+                                    lcd.TimeConcrete(parametr, timeSet);
+                                }
+                                if(upButton->Clicked() || downButton->Clicked() && !parametr){
+                                    timeSet = true ? false : true;
+                                    lcd.ClearAll();
+                                    lcd.TimeConcrete(parametr, timeDelay);
+                                }
                             }
                         }
                     }
                     // надо сохранить в EEprom
                     break;
-                case 4: // отложенное время
-                    while (1)
-                    {
-                        if (settingsButton.Pressed())
-                        {
-                            break;
-                        }
-                        if (upButton->Clicked())
-                        {
-                            if (timeDelay)
-                            {
-                                timeDelay = false;
-                            }
-                            else
-                            {
-                                timeDelay = true;
-                            }
-                        }
-                        if (downButton->Clicked())
-                        {
-                            if (!timeDelay)
-                            {
-                                timeDelay = true;
-                            }
-                            else
-                            {
-                                timeDelay = false;
-                            }
-                        }
-                    }
                 default:
                     break;
                 }

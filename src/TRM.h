@@ -33,7 +33,7 @@ private:
     byte numberPause = 0;
     byte checkButtonClicked();
     byte checkButtonPressed();
-    bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom
+    bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     void WiFiConnect(); //Подключение к wifi
