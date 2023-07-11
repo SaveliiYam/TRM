@@ -316,10 +316,31 @@ void TRM::settings()
     }
 }
 
+void TRM::startProgramm(){
+    if(startStopButton.Pressed()){
+        lcd.ClearAll();
+        lcd.stopProgramm();
+        programmRun = false;
+    }
+    if(startStopButton.Clicked() && !programmRun){
+        lcd.ClearAll();
+        lcd.startProgramm();
+        programmRun = true;
+    }
+}
 
 void TRM::main_programm()
 {
     settings();
+    motorOn();
+    startProgramm();
+}
+
+byte TRM::getPIDvalue(){
+    if(programmRun){
+        return regulator.getValuePID(getTemperature());
+    }
+    else{return 0;}
 }
 
 void TRM::WiFiConnect()

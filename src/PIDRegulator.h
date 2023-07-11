@@ -30,7 +30,7 @@ public:
     //Надо каждый раз вводить лимиты
     void const setLimits(const byte &minValue, const byte &maxValue) { regulator.setLimits(minValue, maxValue); }
     //Получить значение
-    int getValuePID(const float &temperatureNow);
+    byte getValuePID(const float &temperatureNow);
     //Надо вызывать перед каждым тюном
     void tuneInitialization(const float &temperatureNeed);
     //тюн
@@ -38,12 +38,8 @@ public:
     //вставить коэффициенты в регулятор
     void enterPIDKoefficients(const Koefficients &koefficients);
     //
-    void loadKoefficients(){EEPROM.get(200, koefficients);}
-    void saveKoefficients(){EEPROM.put(200, koefficients);}
-    void baseKoefficients(){
-        Koefficients base;
-        koefficients = base;
-        saveKoefficients();
-    }
+    void loadKoefficients();
+    void saveKoefficients();
+    void baseKoefficients();
 };
 

@@ -32,6 +32,8 @@ public:
     void NumberProg(byte numberProgramm);
     void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
     void BaseSettings(const bool& parametr);
+    void stopProgramm();
+    void startProgramm();
 };
 
 void LCD::ClearAll() { lcd.clear(); }
@@ -40,6 +42,16 @@ void LCD::Point(const byte &parametr)
 {
     lcd.setCursor(0, parametr);
     lcd.print(char(0));
+}
+
+void LCD::stopProgramm(){
+    lcd.setCursor(0, 0);
+    lcd.print("Programm stop");
+}
+
+void LCD::startProgramm(){
+    lcd.setCursor(0, 0);
+    lcd.print("Programm start");
 }
 
 void LCD::BaseSettings(const bool& parametr){

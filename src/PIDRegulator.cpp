@@ -1,6 +1,6 @@
 #include "PIDRegulator.h"
 
-int PIDRegulator::getValuePID(const float &temperatureNow)
+byte PIDRegulator::getValuePID(const float &temperatureNow)
 {
     regulator.input = temperatureNow;
     return regulator.getResult();
@@ -31,8 +31,16 @@ bool PIDRegulator::tunePID(const float &temperatureNow)
         // надо записать в EEPROM
 
         enterPIDKoefficients(koefficients);
-
+        saveKoefficients();
         return true;
     }
     return false;
 }
+
+void PIDRegulator::loadKoefficients(){EEPROM.get(200, koefficients);}
+void PIDRegulator::saveKoefficients(){EEPROM.put(200, koefficients);}
+void PIDRegulator::baseKoefficients(){
+        Koefficients base;
+        koefficients = base;
+        saveKoefficients();
+    }

@@ -37,7 +37,7 @@ void loop()
         dimmer.tickTimer(); // вызвать tickTimer()
         timer.stop();    // остановить таймер
     }
-    dimmer.write(0); // принимает 0-255
+    dimmer.write(trm.getPIDvalue()); // принимает 0-255
 }
 
 void isr()

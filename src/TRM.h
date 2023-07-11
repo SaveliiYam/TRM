@@ -53,6 +53,7 @@ private:
     byte checkButtonPressed();
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
+    bool programmRun = false; // Переменная связанная с запуском программы
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     void WiFiConnect(); //Подключение к wifi
     bool wifiOn = false, _motorState = false;
@@ -68,11 +69,13 @@ private:
     void settings();
     void motorOn();
     void startProgramm();
+    
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
     
     void main_programm();
+    byte getPIDvalue();
 };
 
 
