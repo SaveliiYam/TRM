@@ -336,6 +336,10 @@ void TRM::main_programm()
     startProgramm();
 }
 
+void TRM::runProgramm(){
+    
+}
+
 byte TRM::getPIDvalue(){
     if(programmRun){
         return regulator.getValuePID(getTemperature());

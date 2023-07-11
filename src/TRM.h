@@ -69,6 +69,7 @@ private:
     void settings();
     void motorOn();
     void startProgramm();
+    void runProgramm();
     
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
