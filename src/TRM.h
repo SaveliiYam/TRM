@@ -61,16 +61,18 @@ private:
     void saveParametrs();
     void loadParametrs();
     void baseParametrs();
-public:
-    TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
-        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
     float getTemperature();
     void chooseNumberPause();
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
-    void main_programm();
     void motorOn();
+    void startProgramm();
+public:
+    TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
+        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
+    
+    void main_programm();
 };
 
 

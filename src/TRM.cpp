@@ -4,11 +4,8 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
          const byte &nmbBtn, const byte &mtrBtn, const byte& mtrPin , const byte &sckPin, const byte &csPin, const byte &soPin)
     : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
 {
-    // downButton.ini(dwnBtn);
-    // upButton.ini(upBtn);
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
-    // numberButton.ini(nmbBtn);
     motorButton.ini(mtrBtn);
     
     pinMode(_motorPin, OUTPUT);
@@ -22,20 +19,6 @@ float TRM::getTemperature()
 {
     return termoCouple.ReadCelsius();
 }
-/*
-void TRM::chooseNumberPause()
-{
-
-    if (numberButton.click())
-    {
-        numberPause++;
-    }
-    if (numberPause == 4)
-    {
-        numberPause = 1;
-    }
-}
-*/
 
 byte TRM::getNumberPause() const { return numberPause; }
 
@@ -358,7 +341,8 @@ void TRM::WiFiConnect()
 
 void TRM::motorOn(){
     if(motorButton.Pressed()){
-
+        _motorState = true ? false : true;
+        digitalWrite(_motorPin, _motorState);
     }
 }
 
