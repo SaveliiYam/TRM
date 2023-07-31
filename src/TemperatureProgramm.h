@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "Pair.h"
 #include <EEPROM.h>
+#include "Structures.h"
 
 /*
 struct temperaturePausesStruct{
@@ -10,6 +11,7 @@ struct temperaturePausesStruct{
     int16_t time[6];
 };
 */
+
 
 class TemperatureProgramm{
 private:

@@ -11,6 +11,7 @@
 #include <WiFiManager.h> //библиотека для подключения к wifi
 #include <strings_en.h> 
 #include "PIDRegulator.h"
+#include "Structures.h"
 
 /*
     EEPROM:
@@ -21,10 +22,7 @@
     250 - TRM
 */
 
-struct temperaturePausesStruct{ //30 byte + 10byte
-    byte setpointTemperature[6]; //1 byte
-    uint16_t time[6];            //4 byte
-};
+
 
 struct parametrs{
     parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin)

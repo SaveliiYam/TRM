@@ -1,13 +1,13 @@
 #include "TRM.h"
 
 TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
-         const byte &nmbBtn, const byte &mtrBtn, const byte& mtrPin , const byte &sckPin, const byte &csPin, const byte &soPin)
+         const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin)
     : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
 {
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
     motorButton.ini(mtrBtn);
-    
+
     pinMode(_motorPin, OUTPUT);
     digitalWrite(_motorPin, _motorState);
 
@@ -83,21 +83,26 @@ void TRM::settings()
         byte i = 0;
         lcd.ClearAll();
         lcd.settingsMainMenu(i);
+        int whatMenu = 0;
         while (1)
-        {   
-            //Чтобы зайти в базовые настройки надо зажать клавищу с мотором
-            if(motorButton.Pressed()){
+        {
+            // Чтобы зайти в базовые настройки надо зажать клавищу с мотором
+            if (motorButton.Pressed())
+            {
                 bool parametr = false;
                 lcd.ClearAll();
                 lcd.BaseSettings(parametr);
-                while(1){
-                    if(upButton->Clicked() || downButton->Clicked()){
+                while (1)
+                {
+                    if (upButton->Clicked() || downButton->Clicked())
+                    {
                         parametr = true ? false : true;
                         lcd.ClearAll();
                         lcd.BaseSettings(parametr);
                     }
-                    if(settingsButton.Clicked()){
-                        if(parametr)
+                    if (settingsButton.Clicked())
+                    {
+                        if (parametr)
                             baseParametrs();
                         break;
                     }
@@ -107,23 +112,24 @@ void TRM::settings()
                 break;
             if (upButton->Clicked())
             {
-                i++;
-                i = constrain(i, 0, 3);
+                whatMenu++;
+                whatMenu = constrain(whatMenu, 0, 3);
                 lcd.ClearAll();
-                lcd.settingsMainMenu(i);
+                lcd.settingsMainMenu(whatMenu);
             } // Перемещение кнопками up down
             if (downButton->Clicked())
             {
-                i--;
-                i = constrain(i, 0, 3);
+                whatMenu--;
+                whatMenu = constrain(whatMenu, 0, 3);
                 lcd.ClearAll();
-                lcd.settingsMainMenu(i);
+                lcd.settingsMainMenu(whatMenu);
             }
             if (startStopButton.Clicked())
             {
-                switch (i)
+                switch (whatMenu)
                 {
                 case 0: // Настройки паузы (ok)
+                {
                     MyButton *numberButton = new MyButton(_numberButton);
                     lcd.ClearAll();
                     lcd.NumberProg(numberPause);
@@ -148,8 +154,10 @@ void TRM::settings()
                         }
                     }
                     delete numberButton;
-                    break;
+                }
+                break;
                 case 1: // вкл/выкл wifi
+                {
                     lcd.ClearAll();
                     lcd.WiFi(wifiOn);
                     while (1)
@@ -190,8 +198,10 @@ void TRM::settings()
                             lcd.WiFi(wifiOn);
                         }
                     }
-                    break;
+                }
+                break;
                 case 2: // параметры по мощности (ok)
+                {
                     bool parametr = false;
                     lcd.ClearAll();
                     lcd.PowerLimits(parametr, powerMin, powerMax);
@@ -256,8 +266,10 @@ void TRM::settings()
                             // надо сохранить все данные в EEprom
                         }
                     }
-                    break;
+                }
+                break;
                 case 3: // выбор времени sec/min (ok!)
+                {
                     bool parametr = false;
                     lcd.ClearAll();
                     lcd.TimeSettings(parametr);
@@ -306,6 +318,7 @@ void TRM::settings()
                         }
                     }
                     // надо сохранить в EEprom
+                }
                     break;
                 default:
                     break;
@@ -316,13 +329,16 @@ void TRM::settings()
     }
 }
 
-void TRM::startProgramm(){
-    if(startStopButton.Pressed()){
+void TRM::startProgramm()
+{
+    if (startStopButton.Pressed())
+    {
         lcd.ClearAll();
         lcd.stopProgramm();
         programmRun = false;
     }
-    if(startStopButton.Clicked() && !programmRun){
+    if (startStopButton.Clicked() && !programmRun)
+    {
         lcd.ClearAll();
         lcd.startProgramm();
         programmRun = true;
@@ -336,15 +352,20 @@ void TRM::main_programm()
     startProgramm();
 }
 
-void TRM::runProgramm(){
-    
+void TRM::runProgramm()
+{
 }
 
-byte TRM::getPIDvalue(){
-    if(programmRun){
+byte TRM::getPIDvalue()
+{
+    if (programmRun)
+    {
         return regulator.getValuePID(getTemperature());
     }
-    else{return 0;}
+    else
+    {
+        return 0;
+    }
 }
 
 void TRM::WiFiConnect()
@@ -364,18 +385,22 @@ void TRM::WiFiConnect()
     }
 }
 
-void TRM::motorOn(){
-    if(motorButton.Pressed()){
+void TRM::motorOn()
+{
+    if (motorButton.Pressed())
+    {
         _motorState = true ? false : true;
         digitalWrite(_motorPin, _motorState);
     }
 }
 
-void TRM::saveParametrs(){
+void TRM::saveParametrs()
+{
     parametrs param{timeSet, timeDelay, powerMax, powerMin};
     EEPROM.put(250, param);
 }
-void TRM::loadParametrs(){
+void TRM::loadParametrs()
+{
     parametrs param;
     EEPROM.get(250, param);
     timeSet = param._timeSet;
@@ -383,8 +408,8 @@ void TRM::loadParametrs(){
     powerMax = param._powerMax;
     powerMin = param._powerMin;
 }
-void TRM::baseParametrs(){
+void TRM::baseParametrs()
+{
     parametrs param;
     EEPROM.put(250, param);
 }
-

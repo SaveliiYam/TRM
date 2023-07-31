@@ -33,6 +33,7 @@ void MyThermoCouple::ini(const byte &SCK, const byte &CS, const byte &SO)
 
 float MyThermoCouple::ReadCelsius(void)
 {
+  static float temperature = 0;
   if (millis() - _tmr > 400)
   {
     _tmr = millis();
@@ -55,8 +56,9 @@ float MyThermoCouple::ReadCelsius(void)
 
     v >>= 3;
 
-    return v * 0.25;
+    temperature = v * 0.25;
   }
+  return temperature;
 }
 
 float MyThermoCouple::ReadFahrenheit(void) { return ReadCelsius() * 9.0 / 5.0 + 32; }

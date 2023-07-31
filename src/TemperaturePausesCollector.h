@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "TemperatureProgramm.h"
 #include "Pair.h"
+#include "Structures.h"
 /*
 Каждый раз при использовании пауз, генерируется коллектор, 
 в который надо передавать номер программы и паузы
