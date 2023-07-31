@@ -68,7 +68,9 @@ void TRM::enterTemperaturePauses()
             }
         }
         pauseEnter.setpointTemperature[i] = temp1;
-        pauseEnter.time[i] = time1;
+        if(timeSet){pauseEnter.time[i] = time1 * 1000;}
+        else{pauseEnter.time[i] = time1 * 60000;}
+        
     }
     collector.writePauses(numberPause, pauseEnter);
     delete downButton, upButton;
@@ -337,7 +339,7 @@ void TRM::startProgramm()
         lcd.stopProgramm();
         programmRun = false;
     }
-    if (startStopButton.Clicked() && !programmRun)
+    else if (startStopButton.Clicked() && !programmRun)
     {
         lcd.ClearAll();
         lcd.startProgramm();
@@ -355,7 +357,12 @@ void TRM::main_programm()
 
 void TRM::runProgramm()
 {
+    static bool runningProgramm;
+    if(!programmRun){runningProgramm = false;}
+    if(programmRun && !runningProgramm){
+        runningProgramm = true;
 
+    }
 }
 
 void TRM::printMainMenu(const float& temperatureNew){
