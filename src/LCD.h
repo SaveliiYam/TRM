@@ -34,6 +34,7 @@ public:
     void BaseSettings(const bool& parametr);
     void stopProgramm();
     void startProgramm();
+    void mainMenu(const float& temperature, const byte& number);
 };
 
 void LCD::ClearAll() { lcd.clear(); }
@@ -42,6 +43,15 @@ void LCD::Point(const byte &parametr)
 {
     lcd.setCursor(0, parametr);
     lcd.print(char(0));
+}
+
+void LCD::mainMenu(const float& temperature, const byte& number){
+    lcd.setCursor(0,0);
+    lcd.print("Number prog: ");
+    lcd.print(number);
+    lcd.setCursor(0,1);
+    lcd.print("Temperature: ");
+    lcd.print(temperature);
 }
 
 void LCD::stopProgramm(){

@@ -1,22 +1,21 @@
-#define input_pin 2
-#define output_pin 3
-#define upButton 17
-#define downButton 33
-#define settingsButtn 18
-#define startButton 19
-#define mtrButton 32
-#define numberButton 23
-
 #include <GyverDimmer.h>
 #include "TimerUs.h"
 #include "TRM.h"
 
 void isr();
 
-byte sck = 25;
-byte cs = 26;
-byte so = 27;
-byte mtrRelay = 5;
+const byte input_pin = 32;
+const byte output_pin = 33;
+const byte upButton = 23;
+const byte downButton = 19;
+const byte settingsButtn = 18;
+const byte startButton = 5;
+const byte mtrButton = 16;
+const byte numberButton = 17;
+const byte sck = 27;
+const byte cs = 26;
+const byte so = 25;
+const byte mtrRelay = 14;
 /*
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);

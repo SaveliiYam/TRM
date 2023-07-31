@@ -331,7 +331,7 @@ void TRM::settings()
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Pressed())
+    if (startStopButton.Pressed() && programmRun)
     {
         lcd.ClearAll();
         lcd.stopProgramm();
@@ -348,12 +348,23 @@ void TRM::startProgramm()
 void TRM::main_programm()
 {
     settings();
-    motorOn();
+    //motorOn();
     startProgramm();
+    printMainMenu(getTemperature());
 }
 
 void TRM::runProgramm()
 {
+
+}
+
+void TRM::printMainMenu(const float& temperatureNew){
+    static float temp = -100;
+    if(temp != temperatureNew){
+        temp = temperatureNew;
+        lcd.ClearAll();
+        lcd.mainMenu(temp, ++numberPause);
+    }
 }
 
 byte TRM::getPIDvalue()

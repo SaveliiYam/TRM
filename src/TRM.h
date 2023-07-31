@@ -47,8 +47,6 @@ private:
     MyButton settingsButton, startStopButton, motorButton;
     //MyButton numberButton;
     MyThermoCouple termoCouple;
-    byte checkButtonClicked();
-    byte checkButtonPressed();
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
     bool programmRun = false; // Переменная связанная с запуском программы
@@ -68,6 +66,7 @@ private:
     void motorOn();
     void startProgramm();
     void runProgramm();
+    void printMainMenu();
     
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
