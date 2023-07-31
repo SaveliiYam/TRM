@@ -22,52 +22,42 @@
     250 - TRM
 */
 
-
-
-struct parametrs{
-    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin)
-            : _timeSet(timeSet)
-            , _timeDelay(timeDelay)
-            , _powerMax(powerMax)
-            , _powerMin(powerMin) {}
-    parametrs(){}
-    bool _timeSet = false;
-    bool _timeDelay = false;
-    byte _powerMax = 255, _powerMin = 0;
-
-};
-
 class TRM
 {
 private:
     byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
+    byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
+
     TemperaturePauseCollector collector;
     //MyButton downButton;
     //MyButton upButton;
     MyButton settingsButton, startStopButton, motorButton;
     //MyButton numberButton;
     MyThermoCouple termoCouple;
+
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
     bool programmRun = false; // Переменная связанная с запуском программы
-    byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
-    void WiFiConnect(); //Подключение к wifi
     bool wifiOn = false, _motorState = false;
+
     LCD lcd;
     PIDRegulator regulator;
-    void saveParametrs();
-    void loadParametrs();
-    void baseParametrs();
+    
     float getTemperature();
-    void chooseNumberPause();
+    
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
     void motorOn();
     void startProgramm();
     void runProgramm();
-    void printMainMenu();
-    
+    void printMainMenu(const float& temperatureNew);
+    void WiFiConnect(); //Подключение к wifi
+    void saveParametrs();
+    void loadParametrs();
+    void baseParametrs();
+    void chooseNumberPause();
+
 public:
     TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
         const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
