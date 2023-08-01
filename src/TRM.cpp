@@ -13,6 +13,8 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
 
     termoCouple.ini(sckPin, csPin, soPin);
     regulator.setLimits(powerMin, powerMax);
+
+    runner.putTimeSettings(timeSet, timeDelay);
 }
 
 float TRM::getTemperature()
@@ -68,9 +70,14 @@ void TRM::enterTemperaturePauses()
             }
         }
         pauseEnter.setpointTemperature[i] = temp1;
-        if(timeSet){pauseEnter.time[i] = time1 * 1000;}
-        else{pauseEnter.time[i] = time1 * 60000;}
-        
+        if (timeSet)
+        {
+            pauseEnter.time[i] = time1 * 1000;
+        }
+        else
+        {
+            pauseEnter.time[i] = time1 * 60000;
+        }
     }
     collector.writePauses(numberPause, pauseEnter);
     delete downButton, upButton;
@@ -319,55 +326,52 @@ void TRM::settings()
                             }
                         }
                     }
+                    runner.putTimeSettings(timeSet, timeDelay);
                     // надо сохранить в EEprom
                 }
-                    break;
-                default:
-                    break;
-                }
+                break;
+            default:
+                break;
             }
         }
-        delete upButton, downButton;
     }
+    delete upButton, downButton;
+}
 }
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Pressed() && programmRun)
+    if (startStopButton.Pressed() && runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.stopProgramm();
-        programmRun = false;
     }
-    else if (startStopButton.Clicked() && !programmRun)
+    else if (startStopButton.Clicked() && !runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.startProgramm();
-        programmRun = true;
+        runner.putProgramm(collector.getPause(numberPause));
     }
 }
 
 void TRM::main_programm()
 {
     settings();
-    //motorOn();
+    // motorOn();
     startProgramm();
     printMainMenu(getTemperature());
 }
 
-void TRM::runProgramm()
+void TRM::runningProgramm()
 {
-    static bool runningProgramm;
-    if(!programmRun){runningProgramm = false;}
-    if(programmRun && !runningProgramm){
-        runningProgramm = true;
-
-    }
+    
 }
 
-void TRM::printMainMenu(const float& temperatureNew){
+void TRM::printMainMenu(const float &temperatureNew)
+{
     static float temp = -100;
-    if(temp != temperatureNew){
+    if (temp != temperatureNew)
+    {
         temp = temperatureNew;
         lcd.ClearAll();
         lcd.mainMenu(temp, ++numberPause);
@@ -376,7 +380,7 @@ void TRM::printMainMenu(const float& temperatureNew){
 
 byte TRM::getPIDvalue()
 {
-    if (programmRun)
+    if (runner.is_programm_run())
     {
         return regulator.getValuePID(getTemperature());
     }

@@ -12,6 +12,7 @@
 #include <strings_en.h> 
 #include "PIDRegulator.h"
 #include "Structures.h"
+#include "ProgrammRunner.h"
 
 /*
     EEPROM:
@@ -27,7 +28,7 @@ class TRM
 private:
     byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
-
+    ProgrammRunner runner;
     TemperaturePauseCollector collector;
     //MyButton downButton;
     //MyButton upButton;
@@ -37,7 +38,6 @@ private:
 
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
-    bool programmRun = false; // Переменная связанная с запуском программы
     bool wifiOn = false, _motorState = false;
 
     LCD lcd;
@@ -50,7 +50,7 @@ private:
     void settings();
     void motorOn();
     void startProgramm();
-    void runProgramm();
+    void runningProgramm();
     void printMainMenu(const float& temperatureNew);
     void WiFiConnect(); //Подключение к wifi
     void saveParametrs();
