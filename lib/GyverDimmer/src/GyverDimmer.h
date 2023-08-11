@@ -132,50 +132,6 @@ private:
     }
 };
 
-// плавный диммер многоканальный
-template < uint8_t _D_AMOUNT >
-class DimmerMulti {
-public:
-    DimmerMulti(uint8_t freq = 50) {
-        if (freq == 50) maxVal = 9300;
-        else maxVal = 7600;
-    }
-    void attach(uint8_t num, uint8_t pin) {
-        dimPins[num] = pin;
-        pinMode(pin, OUTPUT);
-    }
-    void write(uint8_t ch, uint8_t dim) {
-        dimmer[ch] = dim;
-    }
-    bool tickZero() {
-        counter = 255;
-    }
-    void tickTimer() {
-        for (byte i = 0; i < _D_AMOUNT; i++) {
-            if (counter == dimmer[i]) fastWrite(dimPins[i], 1);  			// на текущем тике включаем
-            else if (counter == dimmer[i] - 1) fastWrite(dimPins[i], 0);  	// на следующем выключаем
-        }
-        counter--;
-    }
-    int getPeriod() {
-        return (maxVal == 9300) ? 37 : 31;	// us
-    }
-    
-private:
-    uint8_t dimmer[_D_AMOUNT], dimPins[_D_AMOUNT];
-    int maxVal = 0;
-    volatile int counter = 0;
-    void fastWrite(const uint8_t pin, bool val) {
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
-        if (pin < 8) bitWrite(PORTD, pin, val);
-        else if (pin < 14) bitWrite(PORTB, (pin - 8), val);
-        else if (pin < 20) bitWrite(PORTC, (pin - 14), val);
-#elif defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny13__)
-        bitWrite(PORTB, pin, val);
-#else
-        digitalWrite(pin, val);
-#endif
-    }
-};
+
 
 #endif

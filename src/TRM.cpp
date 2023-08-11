@@ -171,7 +171,7 @@ void TRM::settings()
                     lcd.WiFi(wifiOn);
                     while (1)
                     {
-                        // lcd.WiFi(wifiOn);
+                        lcd.WiFi(wifiOn);
                         if (settingsButton.Clicked())
                         {
                             if (wifiOn)

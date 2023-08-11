@@ -1,22 +1,13 @@
-#pragma once
-#include <Arduino.h>
+#include "MyButton.h"
 
-class MyButton
-{
-private:
-    bool _flag = false;
-    byte _pin;
-    uint32_t _tmr = 0;
+MyButton::MyButton(const byte &pin) : _pin(pin) {
+        pinMode(_pin, INPUT_PULLUP);
+    }
 
-public:
-    MyButton(const byte &pin) : _pin(pin) {}
-    MyButton(){}
-    void ini(const byte &pin);
-    bool Clicked();
-    bool Pressed();
-};
-
-void MyButton::ini(const byte &pin){_pin = pin;}
+void MyButton::ini(const byte &pin){
+    _pin = pin;
+    pinMode(_pin, INPUT_PULLUP);
+}
 
 bool MyButton::Clicked()
 {
