@@ -330,13 +330,13 @@ void TRM::settings()
                     // надо сохранить в EEprom
                 }
                 break;
-            default:
-                break;
+                default:
+                    break;
+                }
             }
         }
+        delete upButton, downButton;
     }
-    delete upButton, downButton;
-}
 }
 
 void TRM::startProgramm()
@@ -350,6 +350,7 @@ void TRM::startProgramm()
     {
         lcd.ClearAll();
         lcd.startProgramm();
+        runner.putTimeSettings(timeSet, timeDelay);
         runner.putProgramm(collector.getPause(numberPause));
     }
 }
@@ -359,11 +360,26 @@ void TRM::main_programm()
     settings();
     // motorOn();
     startProgramm();
-    printMainMenu(getTemperature());
+    if (runner.is_programm_run())
+    {
+        runningProgramm();
+    }
+    else
+    {
+        printMainMenu(getTemperature());
+    }
 }
 
 void TRM::runningProgramm()
 {
+    Pair<byte, uint16_t> pause = runner.runningProgramm(termoCouple.ReadCelsius());
+    lcd.ClearAll();
+    if(timeSet){
+        lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), pause.second()/3600);
+    }
+    else{
+        lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), pause.second()/60);
+    }
     
 }
 

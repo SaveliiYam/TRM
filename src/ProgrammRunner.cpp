@@ -28,6 +28,8 @@ Pair<byte, uint16_t> ProgrammRunner::runningProgramm(const float &temperature)
             numberPause = 0;
             programm_stop();
         }
+        else{startPause();}
+
         return res;
     }
     else if (startTime && timer + programm_.time[numberPause] < millis()) // если отсчет еще не закончен

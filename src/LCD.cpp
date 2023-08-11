@@ -16,6 +16,18 @@ void LCD::Point(const byte &parametr)
     lcd.print(char(0));
 }
 
+void LCD::workProgramm(const float& temperature, const byte& numberPause, const uint16_t time){
+    lcd.setCursor(0, 0);
+    lcd.print("Temperature: ");
+    lcd.print(temperature);
+    lcd.setCursor(0, 1);
+    lcd.print("Time: ");
+    lcd.print(time);
+    lcd.setCursor(0, 2);
+    lcd.print("Pause: ");
+    lcd.print(numberPause);
+}
+
 void LCD::mainMenu(const float &temperature, const byte &number)
 {
     lcd.setCursor(0, 0);
