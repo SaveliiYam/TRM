@@ -1,0 +1,52 @@
+@startuml AllCheme
+
+skinparam PackageStyle rectangle
+skinparam PageMargin 5
+
+
+
+
+interface WebPage{
+    HTMLcode
+}
+
+package PC{}
+
+package Mobile{}
+
+package WiFi{}
+
+package Автоматика{
+    
+    class Экран{}
+    class Программа_технолога{}
+    class Контроллер{}
+    class Входной_блок{}
+    class Блок_управления{}
+}
+
+package ПВК{
+    class Термодатчик
+    class Нагреватель
+    class Выходной_блок
+}
+
+
+
+
+Контроллер<-Блок_управления
+Термодатчик->Входной_блок
+Входной_блок->Контроллер
+Программа_технолога -> Контроллер
+
+Контроллер->Экран
+Контроллер->Выходной_блок
+Выходной_блок->Нагреватель
+
+WebPage<-PC
+WebPage<-Mobile
+PC->WiFi
+Mobile->WiFi
+WiFi->Блок_управления
+
+@enduml 

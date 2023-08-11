@@ -1,0 +1,34 @@
+@startuml AllCheme
+
+skinparam PackageStyle rectangle
+
+package MainMenu{
+}
+
+package Settings{
+    class PauseSettings{
+        number_programm :: numberButton.Clicked()
+        class enterTemperaturePause :: startStopButton.Clicked()
+    }
+    class WifiSettings{
+        wifi_on_off :: upButton.Clicked(), downButton.Clicked()
+    }
+    class PowerSettings{
+        minPower :: upButton.Clicked(), downButton.Clicked()
+        maxPower :: upButton.Clicked(), downButton.Clicked()
+    }
+    class TimeSettings{
+        timeSet :: upButton.Clicked(), downButton.Clicked() min/sec
+        timeDelay :: upButton.Clicked(), downButton.Clicked() on/off
+    }
+}
+
+
+
+MainMenu<--> Settings : SettingsButton.pressed()
+PauseSettings <--> WifiSettings : UpButton.click()/ DownButton.click()
+WifiSettings <--> PowerSettings : UpButton.click()/ DownButton.click()
+PowerSettings <--> TimeSettings : UpButton.click()/ DownButton.click()
+TimeSettings<-->PauseSettings 
+
+@enduml

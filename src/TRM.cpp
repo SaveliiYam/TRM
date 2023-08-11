@@ -117,7 +117,7 @@ void TRM::settings()
                     }
                 }
             }
-            if (settingsButton.Clicked())
+            if (settingsButton.Pressed())
                 break;
             if (upButton->Clicked())
             {
