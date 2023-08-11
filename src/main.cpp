@@ -25,7 +25,7 @@ const byte mtrRelay = 14;
 
 Dimmer<output_pin> dimmer;
 TimerUs timer;
-//TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButton, mtrRelay, sck, cs, so};
+TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButton, mtrRelay, sck, cs, so};
 void setup()
 {
     attachInterrupt(input_pin, isr, RISING);
@@ -33,14 +33,14 @@ void setup()
 
 void loop()
 {
-    // trm.main_programm();
-    // // в "прерывании" таймера
-    // if (timer.ready())
-    // {
-    //     dimmer.tickTimer(); // вызвать tickTimer()
-    //     timer.stop();    // остановить таймер
-    // }
-    dimmer.write(0); // принимает 0-255
+    trm.main_programm();
+    // в "прерывании" таймера
+    if (timer.ready())
+    {
+    dimmer.tickTimer(); // вызвать tickTimer()
+    timer.stop();    // остановить таймер
+    }
+    dimmer.write(trm.getPIDvalue()); // принимает 0-255
 }
 
 void isr()
