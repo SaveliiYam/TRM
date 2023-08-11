@@ -40,4 +40,8 @@ Pair<byte, uint16_t> ProgrammRunner::runningProgramm(const float &temperature)
         Pair<byte, uint16_t> res{numberPause, programm_.time[numberPause]};
         return res;
     }
+    else{
+        Pair<byte, uint16_t> res{numberPause, 0};
+        return res;
+    }
 }
