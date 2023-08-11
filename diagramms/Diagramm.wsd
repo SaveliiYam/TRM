@@ -1,20 +1,18 @@
 @startuml Diagramm
 struct temperaturePausesStruct{
-    byte setpointTemperature[6];
-    int16_t time[6];
+    byte setpointTemperature[6]
+    int16_t time[6]
 }
 
 struct parametrs{
-    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin);
+    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin)
     parametrs(){}
-    bool _timeSet = false;
-    bool _timeDelay = false;
-    byte _powerMax = 255, _powerMin = 0;
-
+    bool _timeSet = false
+    bool _timeDelay = false
+    byte _powerMax = 255, _powerMin = 0
 }
 
 class LCD{
-    LiquidCrystal_I2C lcd{0x27, 20, 4};
     LCD();
     void ClearAll();
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
@@ -28,38 +26,27 @@ class LCD{
     void TimeConcrete(const bool &parametr, const bool &value);
     void NumberProg(byte numberProgramm);
     void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
-    void BaseSettings(const bool& parametr);
+    void BaseSettings(const bool &parametr);
     void stopProgramm();
     void startProgramm();
-    void mainMenu(const float& temperature, const byte& number);
+    void mainMenu(const float &temperature, const byte &number);
 }
 
 class TRM{
-    TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
-        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
-    
-    void main_programm();
-    byte getPIDvalue();
-    
     byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
     byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
-    //MyButton downButton;
-    //MyButton upButton;
     MyButton settingsButton, startStopButton, motorButton;
-    //MyButton numberButton;
     MyThermoCouple termoCouple;
-
     bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false;//переменная связанная с отложенным временем
     bool wifiOn = false, _motorState = false;
-
     LCD lcd;
     PIDRegulator regulator;
-    
+    TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
+        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
     float getTemperature();
-    
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
@@ -71,7 +58,8 @@ class TRM{
     void saveParametrs();
     void loadParametrs();
     void baseParametrs();
-    void chooseNumberPause();
+    void chooseNumberPause();void main_programm();
+    byte getPIDvalue();
 }
 
 class TemperatureProgramm{
@@ -93,6 +81,29 @@ class TemperaturePauseCollector{
     void writePauses(const byte& numberProgramm, const temperaturePausesStruct& pause) //запись программы под номером и передача стр-ры в программу
     Pair<byte, uint16_t> readPause(const byte& numberProgramm, const byte& numberPause)//получить одну паузу и программы
     temperaturePausesStruct getPause(const byte& numberProgramm)//получить программу полностью
+}
+
+class ProgrammRunner{
+    temperaturePausesStruct programm_;
+    bool timeSet = false;
+    bool timeDelay = false;
+    bool startTime = false;
+    bool can_to_start = false;
+    bool is_stopped = false;
+    uint16_t timer = millis();
+    uint16_t ticker = 0;
+    byte numberPause = 0;
+    ProgrammRunner(const temperaturePausesStruct &programm, const bool &time, const bool &delay);
+    ProgrammRunner(const bool &time, const bool &delay);
+    ProgrammRunner();
+    void putTimeSet(const bool &time) { timeSet = time; }
+    void putTimeDelay(const bool &delay) { timeDelay = delay; }
+    void putTimeSettings(const bool &time, const bool &delay)
+    void putProgramm(const temperaturePausesStruct &programm)
+    bool is_programm_run() // если программа закончена, то false
+    void programm_stop();
+    void startPause();
+    Pair<byte, uint16_t> runningProgramm(const float &temperature)
 }
 
 
@@ -131,14 +142,14 @@ class GyverPID{
 }
 
 class MyButton{
-    byte _pin
-    bool _flag = false
-    uint32_t _tmr = millis
-    MyButton(byte pin)
-    MyButton()
-    void ini(byte pin)
-    bool click()
-    bool pressed()
+    bool _flag = false;
+    byte _pin;
+    uint32_t _tmr = 0;
+    MyButton(const byte &pin);
+    MyButton(){}
+    void ini(const byte &pin);
+    bool Clicked();
+    bool Pressed();
 }
 
 class MyThermoCouple{
@@ -150,6 +161,7 @@ class MyThermoCouple{
     float readCelsius();
     float readFarenheit();
 }
+TRM--*ProgrammRunner
 TRM--*LCD : создает
 TRM --* PIDRegulator : Создает
 TRM --* parametrs : используется для сохранения
