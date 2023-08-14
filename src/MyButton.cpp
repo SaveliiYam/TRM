@@ -18,9 +18,10 @@ bool MyButton::Clicked()
         _tmr = millis();
         return true;
     }
-    if (!btnState && _flag && millis() - _tmr >= 500)
+    if (!btnState && _flag && millis() - _tmr >= 300)
     {
         _tmr = millis();
+        return true;
     }
     if (btnState && _flag)
     {

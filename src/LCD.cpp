@@ -5,6 +5,13 @@ LCD::LCD()
     lcd.init();
     lcd.backlight();
     lcd.setCursor(0, 0);
+    lcd.print("hi");
+    lcd.createChar(0, RightArrow);
+}
+
+LCD::LCD(const LiquidCrystal_I2C &lcdNew)
+{
+    lcd = lcdNew;
     lcd.createChar(0, RightArrow);
 }
 
@@ -16,7 +23,8 @@ void LCD::Point(const byte &parametr)
     lcd.print(char(0));
 }
 
-void LCD::workProgramm(const float& temperature, const byte& numberPause, const uint16_t time){
+void LCD::workProgramm(const float &temperature, const byte &numberPause, const uint16_t time)
+{
     lcd.setCursor(0, 0);
     lcd.print("Temperature: ");
     lcd.print(temperature);
@@ -28,7 +36,7 @@ void LCD::workProgramm(const float& temperature, const byte& numberPause, const 
     lcd.print(numberPause);
 }
 
-void LCD::mainMenu(const float &temperature, const byte &number)
+void LCD::mainMenu(const int &temperature, const byte &number)
 {
     lcd.setCursor(0, 0);
     lcd.print("Number prog: ");
@@ -75,18 +83,18 @@ void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &para
     else
         Point(3);
     lcd.setCursor(1, 2);
-    lcd.print("Setpoint temp: ");
+    lcd.print("Set temp: ");
     lcd.print(temperature);
     lcd.setCursor(1, 3);
-    lcd.print("Setpoint time: ");
+    lcd.print("Set time: ");
     lcd.print(time);
 }
 
-void LCD::NumberProg(byte numberProgramm)
+void LCD::NumberProg(const byte& numberProgramm)
 {
     lcd.setCursor(0, 0);
     lcd.print("Number programm: ");
-    lcd.print(++numberProgramm);
+    lcd.print(numberProgramm);
 }
 
 void LCD::TimeConcrete(const bool &parametr, const bool &value)
@@ -156,13 +164,28 @@ void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &ma
         Point(2);
     }
     lcd.setCursor(1, 0);
-    lcd.print("Power limits");
+    lcd.print("Power limits:");
     lcd.setCursor(1, 1);
     lcd.print("minLimit: ");
     lcd.print(minLimit);
     lcd.setCursor(1, 2);
     lcd.print("maxLimit: ");
     lcd.print(maxLimit);
+}
+
+void LCD::PrintLimitMenu(const bool &parametr, const byte &limit)
+{
+    lcd.setCursor(1, 0);
+    if (parametr)
+    {
+        lcd.print("MinLimit: ");
+        lcd.print(limit);
+    }
+    else
+    {
+        lcd.print("MaxLimit: ");
+        lcd.print(limit);
+    }
 }
 
 void LCD::WiFi(const bool &parametr)
@@ -185,21 +208,16 @@ void LCD::WiFi(const bool &parametr)
 
 void LCD::settingsMainMenu(const byte &parametr)
 {
-    static byte parametrOld = 10; // Просто чтобы он показывал сразу
-    if (parametrOld != parametr)
-    {
-        parametrOld = parametr;
-        lcd.clear();
-        Point(parametrOld);
-        lcd.setCursor(1, 0);
-        lcd.print("Pause settings");
-        lcd.setCursor(1, 1);
-        lcd.print("WiFi on/off");
-        lcd.setCursor(1, 2);
-        lcd.print("Power limits");
-        lcd.setCursor(1, 3);
-        lcd.print("sec/min settings");
-    }
+    lcd.clear();
+    Point(parametr);
+    lcd.setCursor(1, 0);
+    lcd.print("Pause settings");
+    lcd.setCursor(1, 1);
+    lcd.print("WiFi on/off");
+    lcd.setCursor(1, 2);
+    lcd.print("Power limits");
+    lcd.setCursor(1, 3);
+    lcd.print("sec/min settings");
 }
 
 void LCD::WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause)

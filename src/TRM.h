@@ -43,7 +43,7 @@ private:
     LCD lcd;
     PIDRegulator regulator;
     
-    float getTemperature();
+    
     
     byte getNumberPause() const;
     void enterTemperaturePauses();
@@ -51,7 +51,7 @@ private:
     void motorOn();
     void startProgramm();
     void runningProgramm();
-    void printMainMenu(const float& temperatureNew);
+    void printMainMenu(const int& temperatureNew);
     void WiFiConnect(); //Подключение к wifi
     void saveParametrs();
     void loadParametrs();
@@ -64,6 +64,13 @@ public:
     
     void main_programm();
     byte getPIDvalue();
+    float getTemperature();
+    void getLCD(const LCD& lcdNew);
+
+    //серверная часть
+    void start_program_from_server();
+    void stop_program_from_server();
+    void put_number_prog(const byte& number);
 };
 
 
