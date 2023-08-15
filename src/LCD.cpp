@@ -46,6 +46,22 @@ void LCD::mainMenu(const int &temperature, const byte &number)
     lcd.print(temperature);
 }
 
+void LCD::mainMenu(const int &temperature, const byte& number, const byte max, const byte& min, const bool& delay, const bool& set){
+    lcd.setCursor(0, 0);
+    lcd.print("Number prog: ");
+    lcd.print(number);
+    lcd.setCursor(0, 1);
+    lcd.print("Temperature: ");
+    lcd.print(temperature);
+    
+    lcd.setCursor(0, 2);
+    lcd.print("Max: "); lcd.print(max);
+    lcd.print(" Min: "); lcd.print(min);
+    lcd.setCursor(0, 3);
+    lcd.print("Set: "); lcd.print(set);
+    lcd.print(" Del: "); lcd.print(delay);
+}
+
 void LCD::stopProgramm()
 {
     lcd.setCursor(0, 0);
@@ -104,10 +120,12 @@ void LCD::TimeConcrete(const bool &parametr, const bool &value)
         if (value)
         {
             Point(1);
+            Serial.println("Point 1");
         }
-        else
+        else if(!value)
         {
             Point(2);
+            Serial.println("Point 2");
         }
         lcd.setCursor(1, 0);
         lcd.print("min/sec");
@@ -122,7 +140,7 @@ void LCD::TimeConcrete(const bool &parametr, const bool &value)
         {
             Point(1);
         }
-        else
+        else if(!value)
         {
             Point(2);
         }
@@ -155,6 +173,8 @@ void LCD::TimeSettings(const bool &parametr)
 
 void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit)
 {
+    byte min = map(minLimit, 0, 255, 0, 100);
+    byte max = map(maxLimit, 0, 255, 0, 100);
     if (parametr)
     {
         Point(1);
@@ -167,25 +187,29 @@ void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &ma
     lcd.print("Power limits:");
     lcd.setCursor(1, 1);
     lcd.print("minLimit: ");
-    lcd.print(minLimit);
+    lcd.print(min);
+    lcd.print('%');
     lcd.setCursor(1, 2);
     lcd.print("maxLimit: ");
-    lcd.print(maxLimit);
+    lcd.print(max);
+    lcd.print('%');
 }
 
 void LCD::PrintLimitMenu(const bool &parametr, const byte &limit)
 {
+    byte lim = map(limit, 0, 255, 0, 100);
     lcd.setCursor(1, 0);
     if (parametr)
     {
         lcd.print("MinLimit: ");
-        lcd.print(limit);
+        lcd.print(lim);
     }
     else
     {
         lcd.print("MaxLimit: ");
-        lcd.print(limit);
+        lcd.print(lim);
     }
+    lcd.print('%');
 }
 
 void LCD::WiFi(const bool &parametr)

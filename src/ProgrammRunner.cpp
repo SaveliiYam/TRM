@@ -4,7 +4,7 @@ ProgrammRunner::ProgrammRunner(const temperaturePausesStruct &programm, const bo
     : programm_(programm), timeSet(time), timeDelay(delay) {}
 ProgrammRunner::ProgrammRunner(const bool &time, const bool &delay) : timeSet(time), timeDelay(delay) {}
 ProgrammRunner::ProgrammRunner() {}
-Pair<byte, uint16_t> ProgrammRunner::runningProgramm(const float &temperature)
+Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
 {
 
     if (!timeDelay || temperature >= (programm_.setpointTemperature[numberPause] - 1) && !can_to_start)
@@ -20,7 +20,7 @@ Pair<byte, uint16_t> ProgrammRunner::runningProgramm(const float &temperature)
 
     if (startTime && timer + programm_.time[numberPause] >= millis()) // если отсчет закончен
     {
-        Pair<byte, uint16_t> res{numberPause, programm_.time[numberPause]};
+        Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
         can_to_start = false;
         numberPause++;
         if (numberPause == 6)
@@ -34,16 +34,16 @@ Pair<byte, uint16_t> ProgrammRunner::runningProgramm(const float &temperature)
     }
     else if (startTime && timer + programm_.time[numberPause] < millis()) // если отсчет еще не закончен
     {
-        Pair<byte, uint16_t> res{numberPause, programm_.time[numberPause]};
+        Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
         return res;
     }
     else if (!startTime) // если еще не начался отсчет
     {
-        Pair<byte, uint16_t> res{numberPause, programm_.time[numberPause]};
+        Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
         return res;
     }
     else{
-        Pair<byte, uint16_t> res{numberPause, 0};
+        Pair<byte, uint32_t> res{numberPause, 0};
         return res;
     }
 }

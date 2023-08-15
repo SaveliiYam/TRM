@@ -32,12 +32,12 @@ public:
     
     ~TemperatureProgramm(){}
 
-    Pair<byte, uint16_t> readPause(const byte& pause) const{ //получаем значения с одной паузы
-        Pair<byte, uint16_t> pp(_pausesStruct.setpointTemperature[pause], _pausesStruct.time[pause]);
+    Pair<byte, uint32_t> readPause(const byte& pause) const{ //получаем значения с одной паузы
+        Pair<byte, uint32_t> pp(_pausesStruct.setpointTemperature[pause], _pausesStruct.time[pause]);
         return pp;
     }
     
-    void writePauses(char temp[6], uint16_t times[6]){ //запись всех пауз, затем надо сохранить
+    void writePauses(char temp[6], uint32_t times[6]){ //запись всех пауз, затем надо сохранить
         for(int i = 0; i < 6; i++){_pausesStruct.setpointTemperature[i] = temp[i];}
         for(int i = 0; i < 6; i++){_pausesStruct.time[i] = times[i];}
     }
@@ -57,6 +57,7 @@ public:
     
     void savePauses(const int& adress){//надо записывать паузы в память
         EEPROM.put(adress, _pausesStruct);
+        EEPROM.commit();
     }
 
 };

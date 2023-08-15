@@ -12,8 +12,8 @@ private:
     bool startTime = false;
     bool can_to_start = false;
     bool is_stopped = false;
-    uint16_t timer = millis();
-    uint16_t ticker = 0;
+    uint32_t timer = millis();
+    uint32_t ticker = 0;
     byte numberPause = 0;
 
 public:
@@ -35,6 +35,6 @@ public:
         timer = millis();
         ticker = programm_.time[numberPause];
     }
-    Pair<byte, uint16_t> runningProgramm(const float &temperature);
+    Pair<byte, uint32_t> runningProgramm(const float &temperature);
 };
 

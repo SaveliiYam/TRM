@@ -45,6 +45,7 @@ public:
     void stopProgramm();
     void startProgramm();
     void mainMenu(const int &temperature, const byte &number);
+    void mainMenu(const int &temperature, const byte& number, const byte max, const byte& min, const bool& delay, const bool& set);
     void workProgramm(const float& temperature, const byte& numberPause, const uint16_t time);
 };
 

@@ -33,6 +33,7 @@ TimerUs timer;
 void setup()
 {
     Serial.begin(9600);
+    EEPROM.begin(300);
     attachInterrupt(input_pin, isr, RISING);
 
     // thing["temperature"] >> [](pson &out)
