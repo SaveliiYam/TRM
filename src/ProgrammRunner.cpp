@@ -26,6 +26,7 @@ void ProgrammRunner::putProgramm(const temperaturePausesStruct &programm)
     }
 
     is_stopped = true;
+    can_to_start = false;
 }
 
 bool ProgrammRunner::is_programm_run() const { return is_stopped; } // если программа закончена, то false
@@ -40,19 +41,23 @@ void ProgrammRunner::startPause()
 
 Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
 {
-
-    if (timeDelay || temperature >= (programm_.setpointTemperature[numberPause] - 1) && !can_to_start)
+    Serial.print("Delay: ");
+    Serial.println(timeDelay);
+    Serial.print("temperature: ");
+    Serial.println(temperature >= programm_.setpointTemperature[numberPause] - 1);
+    Serial.print("start: ");
+    Serial.println(can_to_start);
+    Serial.println(".......");
+    
+    if ((timeDelay || temperature >= (programm_.setpointTemperature[numberPause] - 1)) && !can_to_start)
     {
+        Serial.println("i here");
         can_to_start = true;
         startTime = true;
         startPause();
     }
-    else
-    {
-        startTime = false;
-    }
 
-    if (startTime && timer + programm_.time[numberPause] >= millis()) // если отсчет закончен
+    if (startTime && timer + programm_.time[numberPause] <= millis()) // если отсчет закончен
     {
         Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
         can_to_start = false;
@@ -67,10 +72,10 @@ Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
             startPause();
         }
         Serial.println("Stop pause");
-
+        startTime = false;
         return res;
     }
-    else if (startTime && timer + programm_.time[numberPause] < millis()) // если отсчет еще не закончен
+    else if (startTime && timer + programm_.time[numberPause] > millis()) // если отсчет еще не закончен
     {
         Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
         Serial.println("Also work");
@@ -79,7 +84,7 @@ Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
     else if (!startTime) // если еще не начался отсчет
     {
         Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
-        Serial.println("Wait delay");
+        //Serial.println("Wait delay");
         return res;
     }
     else

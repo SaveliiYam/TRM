@@ -513,7 +513,7 @@ void TRM::startProgramm()
         runner.programm_stop();
         delay(5000);
     }
-    else if (startStopButton.Clicked() && !runner.is_programm_run())
+    if (startStopButton.Clicked() && !runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.startProgramm();
