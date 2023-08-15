@@ -14,16 +14,29 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     loadParametrs();
 
     termoCouple.ini(sckPin, csPin, soPin);
+
     regulator.setLimits(powerMin, powerMax);
 
     runner.putTimeSettings(timeSet, timeDelay);
 
     Serial.print("Time set: ");
-    if(timeSet){Serial.println("true");}
-    else{Serial.println("false");}
+    if (timeSet)
+    {
+        Serial.println("true");
+    }
+    else
+    {
+        Serial.println("false");
+    }
     Serial.print("Time delay: ");
-    if(timeDelay){Serial.println("true");}
-    else{Serial.println("false");}
+    if (timeDelay)
+    {
+        Serial.println("true");
+    }
+    else
+    {
+        Serial.println("false");
+    }
     Serial.print("POwer MAX: ");
     Serial.println(powerMax);
     Serial.print("POwer MIN: ");
@@ -56,10 +69,12 @@ void TRM::enterTemperaturePauses()
         if (timeSet)
         {
             time1 = pauseEnter.time[i] / 1000;
+            // time1 = pauseEnter.time[i];
         }
         if (!timeSet)
         {
             time1 = pauseEnter.time[i] / 60000;
+            // time1 = pauseEnter.time[i];
         }
         lcd.ClearAll();
         lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1);
@@ -97,12 +112,42 @@ void TRM::enterTemperaturePauses()
             if (downButton->Clicked())
             {
                 time1--;
+                if (!timeSet)
+                {
+                    if (time1 > 120 || time1 < 0)
+                    {
+                        time1 = 0;
+                    }
+                }
+                else
+                {
+                    if (time1 > 7200 || time1 < 0)
+                    {
+                        time1 = 7200;
+                    }
+                }
+                Serial.println(time1);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
             }
             if (upButton->Clicked())
             {
                 time1++;
+                if (!timeSet)
+                {
+                    if (time1 > 120)
+                    {
+                        time1 = 120;
+                    }
+                }
+                else
+                {
+                    if (time1 > 7200)
+                    {
+                        time1 = 7200;
+                    }
+                }
+                Serial.println(time1);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
             }
@@ -111,10 +156,14 @@ void TRM::enterTemperaturePauses()
         if (timeSet)
         {
             pauseEnter.time[i] = time1 * 1000;
+            // pauseEnter.time[i] = time1;
+            Serial.println("sec");
         }
         else if (!timeSet)
         {
             pauseEnter.time[i] = time1 * 60000;
+            // pauseEnter.time[i] = time1;
+            Serial.println("min");
         }
         Serial.print("Time: ");
         Serial.println(time1);
@@ -242,7 +291,7 @@ void TRM::settings()
                     while (1)
                     {
                         lcd.WiFi(wifiOn);
-                        if (settingsButton.Clicked())
+                        if (settingsButton.Clicked() || startStopButton.Clicked())
                         {
                             if (wifiOn)
                             {
@@ -321,7 +370,7 @@ void TRM::settings()
 
                             while (1)
                             {
-                                if (settingsButton.Clicked())
+                                if (settingsButton.Clicked() || startStopButton.Clicked())
                                 {
                                     lcd.ClearAll();
                                     lcd.PowerLimits(parametr, powerMin, powerMax);
@@ -404,7 +453,7 @@ void TRM::settings()
                             }
                             while (1)
                             {
-                                if (settingsButton.Clicked())
+                                if (settingsButton.Clicked() || startStopButton.Clicked())
                                 {
                                     lcd.ClearAll();
                                     lcd.TimeSettings(parametrTime);
@@ -462,33 +511,18 @@ void TRM::startProgramm()
         lcd.ClearAll();
         lcd.stopProgramm();
         runner.programm_stop();
+        delay(5000);
     }
     else if (startStopButton.Clicked() && !runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.startProgramm();
         runner.putTimeSettings(timeSet, timeDelay);
-        runner.putProgramm(collector.getPause(numberPause));
+        Serial.print("Number Programm:");
+        Serial.println(numberPause);
+        temperaturePausesStruct temp = collector.getPause(numberPause);
+        runner.putProgramm(temp);
     }
-}
-
-void TRM::start_program_from_server()
-{
-    lcd.ClearAll();
-    lcd.startProgramm();
-    runner.putTimeSettings(timeSet, timeDelay);
-    runner.putProgramm(collector.getPause(numberPause));
-}
-void TRM::stop_program_from_server()
-{
-    lcd.ClearAll();
-    lcd.stopProgramm();
-    runner.programm_stop();
-}
-
-void TRM::put_number_prog(const byte &number)
-{
-    numberPause = number;
 }
 
 void TRM::main_programm()
@@ -509,14 +543,22 @@ void TRM::main_programm()
 void TRM::runningProgramm()
 {
     Pair<byte, uint32_t> pause = runner.runningProgramm(termoCouple.ReadCelsius());
-    lcd.ClearAll();
-    if (timeSet)
+    uint32_t time_lcd = pause.second();
+    static uint32_t miniTimer;
+    if (millis() - miniTimer >= 1000)
     {
-        lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), pause.second() / 3600);
-    }
-    else
-    {
-        lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), pause.second() / 60);
+        lcd.ClearAll();
+        miniTimer = millis();
+        if (timeSet)
+        {
+            lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd / 1000);
+        }
+        else if (!timeSet)
+        {
+            lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd / 60000);
+        }
     }
 }
 
@@ -528,8 +570,8 @@ void TRM::printMainMenu(const int &temperatureNew)
         temp = temperatureNew;
         byte pause = getNumberPause() + 1;
         lcd.ClearAll();
-        //lcd.mainMenu(temp, pause);
-        lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet);//для отладки
+        // lcd.mainMenu(temp, pause);
+        lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet); // для отладки
     }
 }
 
@@ -590,4 +632,23 @@ void TRM::baseParametrs()
 {
     parametrs param;
     EEPROM.put(250, param);
+}
+
+void TRM::start_program_from_server()
+{
+    lcd.ClearAll();
+    lcd.startProgramm();
+    runner.putTimeSettings(timeSet, timeDelay);
+    runner.putProgramm(collector.getPause(numberPause));
+}
+void TRM::stop_program_from_server()
+{
+    lcd.ClearAll();
+    lcd.stopProgramm();
+    runner.programm_stop();
+}
+
+void TRM::put_number_prog(const byte &number)
+{
+    numberPause = number;
 }
