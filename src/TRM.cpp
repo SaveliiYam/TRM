@@ -543,6 +543,7 @@ void TRM::main_programm()
 void TRM::runningProgramm()
 {
     Pair<byte, uint32_t> pause = runner.runningProgramm(termoCouple.ReadCelsius());
+    byte pause1 = pause.first() + 1;
     uint32_t time_lcd = pause.second();
     static uint32_t miniTimer;
     if (millis() - miniTimer >= 1000)
@@ -551,13 +552,13 @@ void TRM::runningProgramm()
         miniTimer = millis();
         if (timeSet)
         {
-            lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd / 1000);
+            //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec");
         }
         else if (!timeSet)
         {
-            lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd / 60000);
+            //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 60000, " min");
         }
     }
 }
