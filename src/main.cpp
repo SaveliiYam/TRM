@@ -53,6 +53,11 @@ void setup()
     while (1)
     {
         trm.main_programm();
+        if(timer.ready()){
+            byte pid_val = trm.getPIDvalue();
+            Serial.println(pid_val);
+            dimmer.write(trm.getPIDvalue());
+        }
     }
     
     

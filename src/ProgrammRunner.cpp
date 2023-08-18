@@ -72,11 +72,11 @@ Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
     {
         uint32_t finalTime = timer + programm_.time[numberPause] - millis();
         Pair<byte, uint32_t> res{numberPause, finalTime};
-        Serial.print("millis: ");
-        Serial.println(millis());
-        Serial.print("Final Time: ");
-        Serial.println(finalTime);
-        Serial.println("Also work");
+        // Serial.print("millis: ");
+        // Serial.println(millis());
+        // Serial.print("Final Time: ");
+        // Serial.println(finalTime);
+        // Serial.println("Also work");
         return res;
     }
     else if (!startTime) // если еще не начался отсчет

@@ -558,7 +558,7 @@ void TRM::runningProgramm()
         else if (!timeSet)
         {
             //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 60000, " min");
+            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min");
         }
     }
 }

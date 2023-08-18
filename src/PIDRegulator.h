@@ -6,9 +6,9 @@
 
 struct Koefficients
 {
-    float P = 0;
-    float I = 0;
-    float D = 0;
+    float P = 1;
+    float I = 1;
+    float D = 1;
 };
 
 class PIDRegulator
