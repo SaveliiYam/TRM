@@ -13,6 +13,7 @@
 #include "PIDRegulator.h"
 #include "Structures.h"
 #include "ProgrammRunner.h"
+#include "Third.h"
 
 /*
     EEPROM:

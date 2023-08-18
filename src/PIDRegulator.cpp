@@ -1,9 +1,26 @@
 #include "PIDRegulator.h"
 
-byte PIDRegulator::getValuePID(const float &temperatureNow)
+PIDRegulator::PIDRegulator()
+    { // Нужно из EEprom грузить коэффициенты и писать их в регулятор
+        enterPIDKoefficients(koefficients);
+        regulator.setDt(400);
+        regulator.setDirection(NORMAL);
+        regulator.setLimits(0, 255);
+    }
+
+int PIDRegulator::getValuePID(const int &temperatureNow)
 {
+    // Serial.print("Temperature: ");
+    // Serial.println(temperatureNow);
+    // Serial.print("regulator.Kp");
+    // Serial.println(regulator.Kp);
+
     regulator.input = temperatureNow;
-    return regulator.getResult();
+    return regulator.getResultTimer();
+}
+
+void PIDRegulator::putTemperature(const int& setTemperature){
+    regulator.setpoint = setTemperature;
 }
 
 void PIDRegulator::tuneInitialization(const float &temperatureNeed)

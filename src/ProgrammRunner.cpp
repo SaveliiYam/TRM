@@ -14,15 +14,9 @@ void ProgrammRunner::putTimeSettings(const bool &time, const bool &delay)
 }
 void ProgrammRunner::putProgramm(const temperaturePausesStruct &programm)
 {
-    Serial.println("Load Programm to runner: ");
     for (int i = 0; i!=6; i++){
         programm_.setpointTemperature[i] = programm.setpointTemperature[i];
         programm_.time[i] = programm.time[i];
-        Serial.print("programm runner temp: ");
-        Serial.println(programm_.setpointTemperature[i]);
-        Serial.print("programm main temp: ");
-        Serial.println(programm.setpointTemperature[i]);
-        Serial.println(".....");
     }
 
     is_stopped = true;
@@ -35,16 +29,13 @@ void ProgrammRunner::startPause()
 {
     timer = millis();
     ticker = programm_.time[numberPause];
-
-    Serial.println("New pause");
 }
 
-Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
+Third<byte, uint32_t, byte> ProgrammRunner::runningProgramm(const float &temperature)
 {
     
     if ((timeDelay || temperature >= (programm_.setpointTemperature[numberPause] - 1)) && !can_to_start)
     {
-        Serial.println("i here");
         can_to_start = true;
         startTime = true;
         startPause();
@@ -52,7 +43,7 @@ Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
 
     if (startTime && timer + programm_.time[numberPause] <= millis()) // если отсчет закончен
     {
-        Pair<byte, uint32_t> res{numberPause, 0};
+        Third<byte, uint32_t, byte> res{numberPause, 0, programm_.setpointTemperature[numberPause]};
         can_to_start = false;
         numberPause++;
         if (numberPause == 6)
@@ -64,30 +55,23 @@ Pair<byte, uint32_t> ProgrammRunner::runningProgramm(const float &temperature)
         {
             startPause();
         }
-        Serial.println("Stop pause");
         startTime = false;
         return res;
     }
     else if (startTime && timer + programm_.time[numberPause] > millis()) // если отсчет еще не закончен
     {
         uint32_t finalTime = timer + programm_.time[numberPause] - millis();
-        Pair<byte, uint32_t> res{numberPause, finalTime};
-        // Serial.print("millis: ");
-        // Serial.println(millis());
-        // Serial.print("Final Time: ");
-        // Serial.println(finalTime);
-        // Serial.println("Also work");
+        Third<byte, uint32_t, byte> res{numberPause, finalTime, programm_.setpointTemperature[numberPause]};
         return res;
     }
     else if (!startTime) // если еще не начался отсчет
     {
-        Pair<byte, uint32_t> res{numberPause, programm_.time[numberPause]};
-        //Serial.println("Wait delay");
+        Third<byte, uint32_t, byte> res{numberPause, programm_.time[numberPause], programm_.setpointTemperature[numberPause]};
         return res;
     }
     else
     {
-        Pair<byte, uint32_t> res{numberPause, 0};
+        Third<byte, uint32_t, byte> res{numberPause, 0, programm_.setpointTemperature[numberPause]};
         return res;
     }
 }

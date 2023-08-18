@@ -506,22 +506,20 @@ void TRM::settings()
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Pressed() && runner.is_programm_run())
+    if (startStopButton.Clicked() && runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.stopProgramm();
         runner.programm_stop();
-        delay(5000);
+        delay(2000);
     }
     if (startStopButton.Clicked() && !runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.startProgramm();
         runner.putTimeSettings(timeSet, timeDelay);
-        Serial.print("Number Programm:");
-        Serial.println(numberPause);
-        temperaturePausesStruct temp = collector.getPause(numberPause);
-        runner.putProgramm(temp);
+        runner.putProgramm(collector.getPause(numberPause));
+        delay(1000);
     }
 }
 
@@ -542,9 +540,14 @@ void TRM::main_programm()
 
 void TRM::runningProgramm()
 {
-    Pair<byte, uint32_t> pause = runner.runningProgramm(termoCouple.ReadCelsius());
+    Third<byte, uint32_t, byte> pause = runner.runningProgramm(termoCouple.ReadCelsius());
     byte pause1 = pause.first() + 1;
     uint32_t time_lcd = pause.second();
+    static byte setpointTemp;
+    if(setpointTemp != pause.third()){
+        setpointTemp = pause.third();
+        regulator.putTemperature(setpointTemp);
+    }
     static uint32_t miniTimer;
     if (millis() - miniTimer >= 1000)
     {
@@ -553,12 +556,12 @@ void TRM::runningProgramm()
         if (timeSet)
         {
             //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec");
         }
         else if (!timeSet)
         {
             //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min");
         }
     }
 }

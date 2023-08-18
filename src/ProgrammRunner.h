@@ -2,7 +2,8 @@
 #include <Arduino.h>
 #include "Structures.h"
 #include "Pair.h"
-//#include "TemperaturePausesCollector.h"
+#include "Third.h"
+// #include "TemperaturePausesCollector.h"
 
 class ProgrammRunner
 {
@@ -28,6 +29,6 @@ public:
     bool is_programm_run() const; // если программа закончена, то false
     void programm_stop();
     void startPause();
-    Pair<byte, uint32_t> runningProgramm(const float &temperature);
+    //Pair<byte, uint32_t> runningProgramm(const float &temperature);
+    Third<byte, uint32_t, byte> runningProgramm(const float &temperature);
 };
-
