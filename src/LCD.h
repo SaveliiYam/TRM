@@ -28,6 +28,8 @@ private:
 public:
     LCD();
     LCD(const LiquidCrystal_I2C& lcdNew);
+    void ConnectToWifi(const bool& connect);
+    void Connecting();
     void ClearAll();
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
     void WriteTemperature(const float &temperature);

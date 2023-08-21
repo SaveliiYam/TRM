@@ -8,6 +8,14 @@
     140 - 3 pause
     200 - PIDKoefficients
     250 - TRM
+
+    300 - 4 pause
+    340 - 5 pause
+    380 - 6 pause
+    420 - 7 pause
+    460 - 8 pause
+    500 - 9 pause
+    540 - 10 pause
 */
 
 struct temperaturePausesStruct{ //30 byte + 10byte

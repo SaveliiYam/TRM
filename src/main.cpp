@@ -1,13 +1,21 @@
 #include "TRM.h"
 #include "LCD.h"
 #include <LiquidCrystal_I2C.h>
-// #include <ThingerESP32.h>
-// #include "arduino_secrets.h"
-// #define TINGER_SERIAL_DEBUG
-// ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
+#include <SimplePortal.h>
+#include <ThingerESP32.h>
+#include <EEPROM.h>
+#include "arduino_secrets.h"
+#include "MyButton.h"
+#include "Fouth.h"
+#define TINGER_SERIAL_DEBUG
+ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
+
 int a = 0, b;
 bool high_low = false;
+bool start_programm = false;
+float temp;
 uint32_t timer = millis();
+Fouth<bool, bool, byte, byte> parametrs{false, false, 0, 255};
 
 const byte input_pin = 25;
 const byte output_pin = 26;
@@ -22,32 +30,34 @@ const byte cs = 14;
 const byte so = 27;
 const byte mtrRelay = 14;
 
+void connectWiFi();
 void setup()
 {
     Serial.begin(9600);
-    EEPROM.begin(300);
+    EEPROM.begin(600);
 
-    // thing["temperature"] >> [](pson &out)
-    // {
-    //     out["temperature"] = trm.getTemperature();
-    // };
-
-    LiquidCrystal_I2C lcd(0x27, 20, 4);
-    lcd.init();
-    lcd.backlight();
-    lcd.setCursor(0, 0);
-    lcd.print("hi");
-
+    connectWiFi();
+    
     delay(500);
     // LCD lcdClass(lcd);
     pinMode(output_pin, OUTPUT);
     digitalWrite(output_pin, LOW);
 
     TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButton, mtrRelay, sck, cs, so};
+
+    thing["temperature"] >> [](pson &out)
+    {
+        out = temp;
+    };
+    thing["start programm"] << [](pson &in)
+    {
+        start_programm = in ? true : false;
+    };
+
     while (1)
     {
         trm.main_programm();
-        
+        temp = trm.getTemperature();
         a = trm.getPIDvalue();
         b = map(a, 0, 255, 255, 0);
 
@@ -63,11 +73,49 @@ void setup()
             timer = millis();
             high_low = false;
         }
-        //Serial.print("PID value: ");
-        //Serial.println(a);
+        if (trm.check_wifi())
+        {
+            thing.handle();
+            parametrs = trm.getParametrs();
+        }
     }
 }
 
 void loop()
 {
+}
+
+void connectWiFi()
+{
+    LCD *lcd = new LCD();
+    MyButton *upBtn = new MyButton(upButton);
+    MyButton *downBtn = new MyButton(downButton);
+    MyButton *startBtn = new MyButton(startButton);
+    bool connect = false;
+    lcd->ClearAll();
+    lcd->ConnectToWifi(connect);
+
+    while (1)
+    {
+        if (upBtn->Clicked() || upBtn->Clicked())
+        {
+            if (connect)
+                connect = false;
+            else
+                connect = true;
+            lcd->ClearAll();
+            lcd->ConnectToWifi(connect);
+        }
+        if (startBtn->Clicked())
+        {
+            if (connect)
+            {
+                lcd->ClearAll();
+                lcd->Connecting();
+                portalRun();
+            }
+            delete lcd, upBtn, downBtn, startBtn;
+            return;
+        }
+    }
 }

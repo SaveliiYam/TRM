@@ -1,5 +1,7 @@
 #include "TRM.h"
 
+#include <SimplePortal.h>
+
 TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
          const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin)
     : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
@@ -266,7 +268,7 @@ void TRM::settings()
                         if (numberButton->Clicked())
                         {
                             numberPause++;
-                            if (numberPause >= 3)
+                            if (numberPause >= 7)
                             {
                                 numberPause = 0;
                             }
@@ -283,7 +285,7 @@ void TRM::settings()
                     delete numberButton;
                 }
                 break;
-                case 1: // вкл/выкл wifi
+                case 1: // тюн и базовые
                 {
                     printSettings = true;
                     lcd.ClearAll();
@@ -501,6 +503,7 @@ void TRM::settings()
         }
         saveParametrs();
         delete upButton, downButton;
+        lcd.ClearAll();
     }
 }
 
@@ -551,17 +554,17 @@ void TRM::runningProgramm()
     static uint32_t miniTimer;
     if (millis() - miniTimer >= 1000)
     {
-        lcd.ClearAll();
+        //lcd.ClearAll();
         miniTimer = millis();
         if (timeSet)
         {
             //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec   ");
         }
         else if (!timeSet)
         {
             //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min   ");
         }
     }
 }
@@ -573,7 +576,7 @@ void TRM::printMainMenu(const int &temperatureNew)
     {
         temp = temperatureNew;
         byte pause = getNumberPause() + 1;
-        lcd.ClearAll();
+        //lcd.ClearAll();
         // lcd.mainMenu(temp, pause);
         lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet); // для отладки
     }
@@ -593,19 +596,19 @@ byte TRM::getPIDvalue()
 
 void TRM::WiFiConnect()
 { // Подключение к WiFi в режиме сначала раздачи, а затем приема
-    WiFi.mode(WIFI_STA);
-    WiFiManager wifiManager;
-    // wifiManager.resetSettings(); //перезапись имени wifi каждый запуск
-    bool res;                             // храним переменную для подключения
-    res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
-    if (!res)
-    {
-        ESP.restart();
-    }
-    else
-    {
-        wifiOn = true;
-    }
+    // Serial.println("here");
+    // portalRun();
+    // Serial.print("Wifi: ");
+    // Serial.println(portalStatus());
+    // WiFi.mode(WIFI_STA);
+    // WiFiManager wifiManager;
+    // // wifiManager.resetSettings(); //перезапись имени wifi каждый запуск
+    // bool res;                             // храним переменную для подключения
+    // res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
+    // if (!res)
+    // {
+    //    ESP.restart();
+    // }
 }
 
 void TRM::motorOn()
@@ -634,8 +637,16 @@ void TRM::loadParametrs()
 }
 void TRM::baseParametrs()
 {
-    parametrs param;
+    parametrs param(false, false, 255, 0);
     EEPROM.put(250, param);
+    temperaturePausesStruct programms{{0,0,0,0,0,0}, {0,0,0,0,0,0}};
+    EEPROM.put(0, programms);
+    EEPROM.put(30, programms);
+    EEPROM.put(60, programms);
+    EEPROM.put(90, programms);
+    EEPROM.put(120, programms);
+    EEPROM.put(150, programms);
+    EEPROM.put(180, programms);
 }
 
 void TRM::start_program_from_server()

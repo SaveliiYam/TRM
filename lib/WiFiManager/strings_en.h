@@ -4,7 +4,7 @@
  *  wm_consts_nn.h
  */
 
-//#warning "This file is deprecated"
+#warning "This file is deprecated"
 
 #ifndef _STRINGS_EN_H_
 #define _STRINGS_EN_H_
