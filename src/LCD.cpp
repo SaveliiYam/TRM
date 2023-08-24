@@ -34,7 +34,9 @@ void LCD::ConnectToWifi(const bool &connect)
         Point(2);
     }
     else
-        {Point(3);}
+    {
+        Point(3);
+    }
     lcd.setCursor(1, 2);
     lcd.print("Yes");
     lcd.setCursor(1, 3);
@@ -46,7 +48,7 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
     lcd.setCursor(0, 0);
     lcd.print("Setpoint: ");
     lcd.print(setpointTemperature);
-    lcd.print("      ");
+    lcd.print(probel);
     lcd.setCursor(0, 1);
     lcd.print("Temperature: ");
     lcd.print(temperature);
@@ -58,7 +60,7 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
     lcd.setCursor(0, 3);
     lcd.print("Pause: ");
     lcd.print(numberPause);
-    lcd.print("   ");
+    lcd.print(probel);
 }
 
 void LCD::mainMenu(const int &temperature, const byte &number)
@@ -66,11 +68,11 @@ void LCD::mainMenu(const int &temperature, const byte &number)
     lcd.setCursor(0, 0);
     lcd.print("Number prog: ");
     lcd.print(number);
-    lcd.print("  ");
+    lcd.print(probel);
     lcd.setCursor(0, 1);
     lcd.print("Temperature: ");
     lcd.print(temperature);
-    lcd.print("   ");
+    lcd.print(probel);
 }
 
 void LCD::mainMenu(const int &temperature, const byte &number, const byte max, const byte &min, const bool &delay, const bool &set)
@@ -78,11 +80,11 @@ void LCD::mainMenu(const int &temperature, const byte &number, const byte max, c
     lcd.setCursor(0, 0);
     lcd.print("Number prog: ");
     lcd.print(number);
-    lcd.print("     ");
+    lcd.print(probel);
     lcd.setCursor(0, 1);
     lcd.print("Temperature: ");
     lcd.print(temperature);
-    lcd.print("    ");
+    lcd.print(probel);
 
     // lcd.setCursor(0, 2);
     // lcd.print("Max: "); lcd.print(max);
@@ -135,7 +137,8 @@ void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &para
     lcd.print("Set time: ");
     lcd.print(time);
 }
-void LCD::Connecting(){
+void LCD::Connecting()
+{
     lcd.setCursor(0, 0);
     lcd.print("Connect...");
 }
@@ -145,7 +148,7 @@ void LCD::NumberProg(const byte &numberProgramm)
     lcd.setCursor(0, 0);
     lcd.print("Number programm: ");
     lcd.print(numberProgramm);
-    lcd.print(' ');
+    lcd.print(probel);
 }
 
 void LCD::TimeConcrete(const bool &parametr, const bool &value)
@@ -272,7 +275,7 @@ void LCD::settingsMainMenu(const byte &parametr)
     lcd.setCursor(1, 0);
     lcd.print("Pause settings");
     lcd.setCursor(1, 1);
-    lcd.print("WiFi on/off");
+    lcd.print("Other settings");
     lcd.setCursor(1, 2);
     lcd.print("Power limits");
     lcd.setCursor(1, 3);
@@ -322,4 +325,65 @@ void LCD::Clear(const byte &curs)
 {
     lcd.setCursor(0, curs);
     lcd.print("                    ");
+}
+
+void LCD::TuneBaseSettings(const bool &parametr)
+{
+    lcd.setCursor(0, 0);
+    lcd.print("Other Settings");
+    if (parametr)
+    {
+        Point(1);
+    }
+    else
+    {
+        Point(2);
+    }
+    lcd.setCursor(1, 1);
+    lcd.print("Base koefficients");
+    lcd.setCursor(1, 2);
+    lcd.print("Tune Settings");
+}
+void LCD::TuneBaseSettings(const bool &parametr, const bool &choise)
+{
+    lcd.setCursor(0, 0);
+    if (parametr)
+    {
+        lcd.print("Base Koeff");
+    }
+    else
+    {
+        lcd.print("Tune Settings");
+    }
+    if (choise)
+    {
+        Point(1);
+    }
+    else
+    {
+        Point(2);
+    }
+    lcd.setCursor(1, 1);
+    lcd.print("Yes");
+    lcd.setCursor(1, 2);
+    lcd.print("No");
+}
+
+void LCD::Tuning(const byte &temperatureMax)
+{
+    lcd.setCursor(0, 0);
+    lcd.print("Enter max temp: ");
+    lcd.print(temperatureMax);
+    lcd.print(probel);
+}
+void LCD::TuningProcces(const byte &percent, const byte &temperatureNow)
+{
+    lcd.setCursor(0, 0);
+    lcd.print("Percent: ");
+    lcd.print(percent);
+    lcd.print(probel);
+    lcd.setCursor(0, 1);
+    lcd.print("Temperature: ");
+    lcd.print(temperatureNow);
+    lcd.print(probel);
 }

@@ -3,19 +3,17 @@
 
 /*
     EEPROM:
-    60 - 1 pause
-    100 - 2 pause
-    140 - 3 pause
-    200 - PIDKoefficients
+    0 - 1 pause
+    35 - 2 pause
+    70 - 3 pause
+    105 - 4 pause
+    140 - 4 pause
+    175 - 5 pause
+    210 - 6 pause
+    
     250 - TRM
 
-    300 - 4 pause
-    340 - 5 pause
-    380 - 6 pause
-    420 - 7 pause
-    460 - 8 pause
-    500 - 9 pause
-    540 - 10 pause
+    500 - PIDKoefficients
 */
 
 struct temperaturePausesStruct{ //30 byte + 10byte
@@ -33,4 +31,11 @@ struct parametrs{
     bool _timeSet;
     bool _timeDelay;
     byte _powerMax = 255, _powerMin = 0;
+};
+
+struct Koefficients
+{
+    float P = 1;
+    float I = 1;
+    float D = 1;
 };

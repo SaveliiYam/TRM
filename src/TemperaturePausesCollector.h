@@ -13,7 +13,7 @@ class TemperaturePauseCollector
 {
 private:
     byte _numberProgramms[7] = {0, 1, 2, 3, 4, 5, 6};
-    byte _adress[7] = {0, 30, 60, 90, 120, 150, 180}; // ячейки в которые будут записываться паузы
+    byte _adress[7] = {0, 35, 70, 105, 140, 175, 210}; // ячейки в которые будут записываться паузы
 public:
     TemperaturePauseCollector() {}
 

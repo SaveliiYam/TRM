@@ -49,12 +49,14 @@ private:
     void motorOn();
     void startProgramm();
     void runningProgramm();
+    void tunningProgramm();
     void printMainMenu(const int &temperatureNew);
     void WiFiConnect(); // Подключение к wifi
     void saveParametrs();
     void loadParametrs();
     void baseParametrs();
     void chooseNumberPause();
+    void tuningPID();
 
 public:
     TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
@@ -62,6 +64,7 @@ public:
 
     void main_programm();
     byte getPIDvalue();
+    byte getPIDvalueTune();
     float getTemperature();
     void getLCD(const LCD &lcdNew);
 

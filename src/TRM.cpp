@@ -20,29 +20,6 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     regulator.setLimits(powerMin, powerMax);
 
     runner.putTimeSettings(timeSet, timeDelay);
-
-    Serial.print("Time set: ");
-    if (timeSet)
-    {
-        Serial.println("true");
-    }
-    else
-    {
-        Serial.println("false");
-    }
-    Serial.print("Time delay: ");
-    if (timeDelay)
-    {
-        Serial.println("true");
-    }
-    else
-    {
-        Serial.println("false");
-    }
-    Serial.print("POwer MAX: ");
-    Serial.println(powerMax);
-    Serial.print("POwer MIN: ");
-    Serial.println(powerMin);
 }
 
 void TRM::getLCD(const LCD &lcdNew)
@@ -71,12 +48,12 @@ void TRM::enterTemperaturePauses()
         if (timeSet)
         {
             time1 = pauseEnter.time[i] / 1000;
-            // time1 = pauseEnter.time[i];
+            // time1 = pauseEnter.time[i]; //показывает время в мс
         }
         if (!timeSet)
         {
             time1 = pauseEnter.time[i] / 60000;
-            // time1 = pauseEnter.time[i];
+            // time1 = pauseEnter.time[i]; //показывает время в мс
         }
         lcd.ClearAll();
         lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1);
@@ -288,44 +265,75 @@ void TRM::settings()
                 case 1: // тюн и базовые
                 {
                     printSettings = true;
+                    bool parametrChoice = false;
                     lcd.ClearAll();
-                    lcd.WiFi(wifiOn);
+                    lcd.TuneBaseSettings(parametrChoice);
                     while (1)
                     {
-                        lcd.WiFi(wifiOn);
-                        if (settingsButton.Clicked() || startStopButton.Clicked())
+                        if (settingsButton.Clicked())
                         {
-                            if (wifiOn)
-                            {
-                                WiFiConnect();
-                            }
                             break;
                         }
-                        if (upButton->Clicked())
+                        if (upButton->Clicked() || downButton->Clicked())
                         {
-                            if (!wifiOn)
+                            if (parametrChoice)
                             {
-                                wifiOn = true;
+                                parametrChoice = false;
                             }
                             else
                             {
-                                wifiOn = false;
+                                parametrChoice = true;
                             }
                             lcd.ClearAll();
-                            lcd.WiFi(wifiOn);
+                            lcd.TuneBaseSettings(parametrChoice);
                         }
-                        if (downButton->Clicked())
+                        if (startStopButton.Clicked())
                         {
-                            if (!wifiOn)
-                            {
-                                wifiOn = true;
-                            }
-                            else
-                            {
-                                wifiOn = false;
-                            }
+                            bool yes_no = false;
                             lcd.ClearAll();
-                            lcd.WiFi(wifiOn);
+                            lcd.TuneBaseSettings(parametrChoice, yes_no);
+                            while (1)
+                            {
+                                if (settingsButton.Clicked())
+                                {
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice);
+                                    break;
+                                }
+                                if (startStopButton.Clicked())
+                                {
+                                    if (!yes_no)
+                                    {
+                                    }
+                                    else if (yes_no && !parametrChoice)
+                                    { // т.н
+                                        tuningPID();
+                                        Serial.println("Tune");
+                                        break;
+                                    }
+                                    else if (yes_no && parametrChoice)
+                                    {
+                                        baseParametrs();
+                                        Serial.println("base");
+                                    }
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice);
+                                    break;
+                                }
+                                if (upButton->Clicked() || downButton->Clicked())
+                                {
+                                    if (yes_no)
+                                    {
+                                        yes_no = false;
+                                    }
+                                    else
+                                    {
+                                        yes_no = true;
+                                    }
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice, yes_no);
+                                }
+                            }
                         }
                     }
                 }
@@ -535,6 +543,9 @@ void TRM::main_programm()
     {
         runningProgramm();
     }
+    else if(regulator.getTuneInfo()){
+        tunningProgramm();
+    }
     else
     {
         printMainMenu(getTemperature());
@@ -547,26 +558,30 @@ void TRM::runningProgramm()
     byte pause1 = pause.first() + 1;
     uint32_t time_lcd = pause.second();
     static byte setpointTemp;
-    if(setpointTemp != pause.third()){
+    if (setpointTemp != pause.third())
+    {
         setpointTemp = pause.third();
         regulator.putTemperature(setpointTemp);
     }
     static uint32_t miniTimer;
     if (millis() - miniTimer >= 1000)
     {
-        //lcd.ClearAll();
+        // lcd.ClearAll();
         miniTimer = millis();
         if (timeSet)
         {
-            //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
             lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec   ");
         }
         else if (!timeSet)
         {
-            //lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
+            // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
             lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min   ");
         }
     }
+}
+void TRM::tunningProgramm(){
+    lcd.TuningProcces(regulator.GetParametrsLCD().second(), termoCouple.ReadCelsius());
 }
 
 void TRM::printMainMenu(const int &temperatureNew)
@@ -576,8 +591,8 @@ void TRM::printMainMenu(const int &temperatureNew)
     {
         temp = temperatureNew;
         byte pause = getNumberPause() + 1;
-        //lcd.ClearAll();
-        // lcd.mainMenu(temp, pause);
+        // lcd.ClearAll();
+        //  lcd.mainMenu(temp, pause);
         lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet); // для отладки
     }
 }
@@ -588,27 +603,46 @@ byte TRM::getPIDvalue()
     {
         return regulator.getValuePID(getTemperature());
     }
+    else if(regulator.getTuneInfo()){
+        return regulator.GetPIDValueTune(getTemperature()).first();
+    }
     else
     {
         return 0;
     }
 }
 
-void TRM::WiFiConnect()
-{ // Подключение к WiFi в режиме сначала раздачи, а затем приема
-    // Serial.println("here");
-    // portalRun();
-    // Serial.print("Wifi: ");
-    // Serial.println(portalStatus());
-    // WiFi.mode(WIFI_STA);
-    // WiFiManager wifiManager;
-    // // wifiManager.resetSettings(); //перезапись имени wifi каждый запуск
-    // bool res;                             // храним переменную для подключения
-    // res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
-    // if (!res)
-    // {
-    //    ESP.restart();
-    // }
+
+void TRM::tuningPID()
+{
+    MyButton *upButton = new MyButton(_upButton);
+    MyButton *downButton = new MyButton(_downButton);
+    byte temperatureMax = 80;
+    lcd.ClearAll();
+    lcd.Tuning(temperatureMax);
+    while (1)
+    {
+        if (upButton->Clicked())
+        {
+            temperatureMax++;
+            lcd.Tuning(temperatureMax);
+        }
+        if (downButton->Clicked())
+        {
+            temperatureMax--;
+            lcd.Tuning(temperatureMax);
+        }
+        if (settingsButton.Clicked())
+        {
+            break;
+        }
+        if(startStopButton.Clicked()){
+            regulator.tuneInitialization(temperatureMax);
+            break;
+        }
+    }
+    delete upButton, downButton;
+    return;
 }
 
 void TRM::motorOn()
@@ -639,14 +673,22 @@ void TRM::baseParametrs()
 {
     parametrs param(false, false, 255, 0);
     EEPROM.put(250, param);
-    temperaturePausesStruct programms{{0,0,0,0,0,0}, {0,0,0,0,0,0}};
+    timeSet = param._timeSet;
+    timeDelay = param._timeDelay;
+    powerMax = param._powerMax;
+    powerMin = param._powerMin;
+    runner.putTimeSettings(timeSet, timeDelay);
+    regulator.setLimits(powerMin, powerMax);
+    regulator.baseKoefficients();
+    temperaturePausesStruct programms{{0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}};
     EEPROM.put(0, programms);
-    EEPROM.put(30, programms);
-    EEPROM.put(60, programms);
-    EEPROM.put(90, programms);
-    EEPROM.put(120, programms);
-    EEPROM.put(150, programms);
-    EEPROM.put(180, programms);
+    EEPROM.put(35, programms);
+    EEPROM.put(70, programms);
+    EEPROM.put(105, programms);
+    EEPROM.put(140, programms);
+    EEPROM.put(175, programms);
+    EEPROM.put(210, programms);
+    EEPROM.commit();
 }
 
 void TRM::start_program_from_server()

@@ -3,13 +3,10 @@
 #include <GyverPID.h>
 #include <PIDtuner.h>
 #include <EEPROM.h>
+#include "Structures.h"
+#include "Pair.h"
+#include "Third.h"
 
-struct Koefficients
-{
-    float P = 1;
-    float I = 1;
-    float D = 1;
-};
 
 class PIDRegulator
 {
@@ -17,7 +14,8 @@ private:
     Koefficients koefficients;
     GyverPID regulator;
     PIDtuner tuner;
-
+    bool tune = false;
+    Pair<byte, byte> parametrsForLCD{0, 0};
 public:
     PIDRegulator();
 
@@ -30,12 +28,15 @@ public:
     //Надо вызывать перед каждым тюном
     void tuneInitialization(const float &temperatureNeed);
     //тюн
-    bool tunePID(const float &temperatureNow);
+    Third<bool, byte, byte> tunePID(const float &temperatureNow);
+    Pair<byte, byte> GetPIDValueTune(const float& temperatureNow);
     //вставить коэффициенты в регулятор
     void enterPIDKoefficients(const Koefficients &koefficients);
     //
     void loadKoefficients();
     void saveKoefficients();
     void baseKoefficients();
+    bool getTuneInfo() const;
+    Pair<byte, byte> GetParametrsLCD() const;
 };
 
