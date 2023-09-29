@@ -1,5 +1,5 @@
 #include "TRM.h"
-#include "LCD.h"
+#include "LCDrus.h"
 #include <LiquidCrystal_I2C.h>
 #include <SimplePortal.h>
 #include <ThingerESP32.h>

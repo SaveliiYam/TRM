@@ -5,7 +5,7 @@
 #include "TemperatureProgramm.h"
 #include "TemperaturePausesCollector.h"
 #include "Pair.h"
-#include "LCD.h"
+
 #include <EEPROM.h>
 #include <WiFi.h>
 #include "PIDRegulator.h"
@@ -13,6 +13,8 @@
 #include "ProgrammRunner.h"
 #include "Third.h"
 #include "Fouth.h"
+
+#include "LCDrus.h"
 
 /*
     EEPROM:

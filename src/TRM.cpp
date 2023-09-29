@@ -391,13 +391,13 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMin++;
+                                        powerMin+=2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMin--;
+                                        powerMin-=2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
@@ -406,13 +406,13 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMax++;
+                                        powerMax+=2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMax--;
+                                        powerMax-=2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
@@ -479,8 +479,8 @@ void TRM::settings()
                                     {
                                         timeSet = true;
                                     }
-                                    Serial.print("timeSet: ");
-                                    Serial.println(timeSet);
+                                    // Serial.print("timeSet: ");
+                                    // Serial.println(timeSet);
                                     lcd.ClearAll();
                                     lcd.TimeConcrete(parametrTime, timeSet);
                                 }
@@ -571,12 +571,12 @@ void TRM::runningProgramm()
         if (timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " sec   ");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " ce\xBA   ");
         }
         else if (!timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " min   ");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " \xBC\xB8\xBD   ");
         }
     }
 }

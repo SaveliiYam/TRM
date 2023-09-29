@@ -4,11 +4,10 @@
 #include <LiquidCrystal_I2C.h>
 #include "Pair.h"
 // #include "Simbols.h"
-
 class LCD
 {
 private:
-    LiquidCrystal_I2C lcd{0x27, 20, 4};
+    LiquidCrystal_I2C lcd{0x38, 20, 4};
     void Point(const byte &parametr);
 
     byte RightArrow[8] = {
@@ -22,6 +21,8 @@ private:
         0b00000,
     };
     char probel[4] = "   ";
+    char yes[3] = "\xe0\x61";
+    char no[4] = "\x48\x65\xBF";
 
 public:
     LCD();
@@ -52,3 +53,4 @@ public:
     void Tuning(const byte &temperatureMax);
     void TuningProcces(const byte &percent, const byte &temperatureNow);
 };
+
