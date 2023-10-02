@@ -26,7 +26,7 @@ private:
 
 public:
     LCD();
-    LCD(const LiquidCrystal_I2C &lcdNew);
+    void ini();
     void ConnectToWifi(const bool &connect);
     void Connecting();
     void ClearAll();

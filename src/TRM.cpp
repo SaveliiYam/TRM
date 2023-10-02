@@ -22,9 +22,8 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     runner.putTimeSettings(timeSet, timeDelay);
 }
 
-void TRM::getLCD(const LCD &lcdNew)
-{
-    lcd = lcdNew;
+void TRM::ini(){
+    lcd.ini();
 }
 
 float TRM::getTemperature()

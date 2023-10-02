@@ -2,6 +2,10 @@
 
 LCD::LCD()
 {
+    
+}
+
+void LCD::ini(){
     //lcd.command(0b101010);
     lcd.init();
     lcd.backlight();
@@ -11,12 +15,6 @@ LCD::LCD()
               "\xB8\xB3"
               "e"
               "\xBF");
-    lcd.createChar(0, RightArrow);
-}
-
-LCD::LCD(const LiquidCrystal_I2C &lcdNew)
-{
-    lcd = lcdNew;
     lcd.createChar(0, RightArrow);
 }
 

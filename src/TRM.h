@@ -64,11 +64,11 @@ public:
     TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
         const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin);
 
+    void ini();
     void main_programm();
     byte getPIDvalue();
     byte getPIDvalueTune();
     float getTemperature();
-    void getLCD(const LCD &lcdNew);
 
     // серверная часть
     void start_program_from_server();
