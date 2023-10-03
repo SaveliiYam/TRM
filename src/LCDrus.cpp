@@ -2,11 +2,11 @@
 
 LCD::LCD()
 {
-    
 }
 
-void LCD::ini(){
-    //lcd.command(0b101010);
+void LCD::ini()
+{
+    // lcd.command(0b101010);
     lcd.init();
     lcd.backlight();
     lcd.setCursor(0, 0);
@@ -418,7 +418,7 @@ void LCD::TuneBaseSettings(const bool &parametr, const bool &choise)
         // lcd.print("Base koefficients");
         lcd.print("Bep\xBD\x79\xBF\xC4");
         lcd.setCursor(0, 1);
-        lcd.print("\xA0\x61\xB7\x6F\xB3\xC3\x65\x20\xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8?"); //Базовые настройки
+        lcd.print("\xA0\x61\xB7\x6F\xB3\xC3\x65\x20\xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8?"); // Базовые настройки
     }
     else
     {
@@ -444,7 +444,7 @@ void LCD::TuneBaseSettings(const bool &parametr, const bool &choise)
 void LCD::Tuning(const byte &temperatureMax)
 {
     lcd.setCursor(0, 0);
-    //lcd.print("Enter max temp: ");
+    // lcd.print("Enter max temp: ");
     lcd.print("B\xB3\x6F\xE3\x20\xBC\x61\xBA\x63\xB8\xBC\x61\xBB\xC4\xBD\x6F\xB9");
     lcd.setCursor(0, 1);
     lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\xC3: ");
@@ -454,14 +454,29 @@ void LCD::Tuning(const byte &temperatureMax)
 void LCD::TuningProcces(const byte &percent, const byte &temperatureNow)
 {
     lcd.setCursor(0, 0);
-    //lcd.print("Percent: ");
+    // lcd.print("Percent: ");
     lcd.print("\xA8\x70\x6F\xE5\x65\xBD\xBF: ");
     lcd.print(percent);
     lcd.print("%");
     lcd.print(probel);
     lcd.setCursor(0, 1);
-    //lcd.print("Temperature: ");
+    // lcd.print("Temperature: ");
     lcd.print("\x54\x65\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61\x3A\x20");
     lcd.print(temperatureNow);
     lcd.print(probel);
+}
+
+void LCD::SuccessConection(const bool &status)
+{
+    lcd.setCursor(0, 1);
+    if (status)
+    {
+        lcd.print("\xA9\x63\xBE\x65\x78");
+    }
+    else
+    {
+        lcd.print("He \xBe\x6F\xBB\x79\xC0\xB8\xBB\x6F\x63\xC4");
+        lcd.setCursor(0,2);
+        lcd.print("\xA8\x65\x70\x65\xB7\x61\xB4\x70\x79\xB7\xBA\x61");
+    }
 }

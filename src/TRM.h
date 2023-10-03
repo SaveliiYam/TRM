@@ -32,15 +32,11 @@ private:
     byte powerMax, powerMin; // переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
-    // MyButton downButton;
-    // MyButton upButton;
     MyButton settingsButton, startStopButton, motorButton;
-    // MyButton numberButton;
     MyThermoCouple termoCouple;
 
     bool timeSet = false;   // переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false; // переменная связанная с отложенным временем
-    bool wifiOn = false, _motorState = false;
 
     LCD lcd;
     PIDRegulator regulator;
@@ -71,9 +67,8 @@ public:
     float getTemperature();
 
     // серверная часть
-    void start_program_from_server();
-    void stop_program_from_server();
+    void start_program_from_server(const bool& start);
+    void stop_program_from_server(const bool& stop);
     void put_number_prog(const byte &number);
-    bool check_wifi() const { return wifiOn; }
     Fouth<bool, bool, byte, byte> getParametrs() const { return Fouth<bool, bool, byte, byte>(timeSet, timeDelay, powerMax, powerMax); }
 };

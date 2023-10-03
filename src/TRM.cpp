@@ -8,10 +8,6 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
 {
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
-    motorButton.ini(mtrBtn);
-
-    pinMode(_motorPin, OUTPUT);
-    digitalWrite(_motorPin, _motorState);
 
     loadParametrs();
 
@@ -22,7 +18,8 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
     runner.putTimeSettings(timeSet, timeDelay);
 }
 
-void TRM::ini(){
+void TRM::ini()
+{
     lcd.ini();
 }
 
@@ -390,13 +387,13 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMin+=2;
+                                        powerMin += 2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMin-=2;
+                                        powerMin -= 2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
@@ -405,13 +402,13 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMax+=2;
+                                        powerMax += 2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMax-=2;
+                                        powerMax -= 2;
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
@@ -542,7 +539,8 @@ void TRM::main_programm()
     {
         runningProgramm();
     }
-    else if(regulator.getTuneInfo()){
+    else if (regulator.getTuneInfo())
+    {
         tunningProgramm();
     }
     else
@@ -579,7 +577,8 @@ void TRM::runningProgramm()
         }
     }
 }
-void TRM::tunningProgramm(){
+void TRM::tunningProgramm()
+{
     lcd.TuningProcces(regulator.GetParametrsLCD().second(), termoCouple.ReadCelsius());
 }
 
@@ -602,7 +601,8 @@ byte TRM::getPIDvalue()
     {
         return regulator.getValuePID(getTemperature());
     }
-    else if(regulator.getTuneInfo()){
+    else if (regulator.getTuneInfo())
+    {
         return regulator.GetPIDValueTune(getTemperature()).first();
     }
     else
@@ -610,7 +610,6 @@ byte TRM::getPIDvalue()
         return 0;
     }
 }
-
 
 void TRM::tuningPID()
 {
@@ -635,22 +634,14 @@ void TRM::tuningPID()
         {
             break;
         }
-        if(startStopButton.Clicked()){
+        if (startStopButton.Clicked())
+        {
             regulator.tuneInitialization(temperatureMax);
             break;
         }
     }
     delete upButton, downButton;
     return;
-}
-
-void TRM::motorOn()
-{
-    if (motorButton.Pressed())
-    {
-        _motorState = true ? false : true;
-        digitalWrite(_motorPin, _motorState);
-    }
 }
 
 void TRM::saveParametrs()
@@ -690,21 +681,28 @@ void TRM::baseParametrs()
     EEPROM.commit();
 }
 
-void TRM::start_program_from_server()
+void TRM::start_program_from_server(const bool &start)
 {
-    lcd.ClearAll();
-    lcd.startProgramm();
-    runner.putTimeSettings(timeSet, timeDelay);
-    runner.putProgramm(collector.getPause(numberPause));
+    if (start)
+    {
+        lcd.ClearAll();
+        lcd.startProgramm();
+        runner.putTimeSettings(timeSet, timeDelay);
+        runner.putProgramm(collector.getPause(numberPause));
+    }
 }
-void TRM::stop_program_from_server()
+void TRM::stop_program_from_server(const bool &stop)
 {
-    lcd.ClearAll();
-    lcd.stopProgramm();
-    runner.programm_stop();
+    if (stop)
+    {
+        lcd.ClearAll();
+        lcd.stopProgramm();
+        runner.programm_stop();
+    }
 }
 
 void TRM::put_number_prog(const byte &number)
 {
     numberPause = number;
+    numberPause--;
 }

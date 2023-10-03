@@ -52,5 +52,6 @@ public:
     void TuneBaseSettings(const bool &parametr, const bool &choise);
     void Tuning(const byte &temperatureMax);
     void TuningProcces(const byte &percent, const byte &temperatureNow);
+    void SuccessConection(const bool& status);
 };
 

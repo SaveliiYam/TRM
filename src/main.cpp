@@ -1,20 +1,24 @@
+#include <WiFiManager.h>
 #include "TRM.h"
 #include "LCDrus.h"
 #include <LiquidCrystal_I2C.h>
-#include <SimplePortal.h>
 #include <ThingerESP32.h>
 #include <EEPROM.h>
 #include "arduino_secrets.h"
 #include "MyButton.h"
 #include "Fouth.h"
 #define TINGER_SERIAL_DEBUG
+
 ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
 
+byte number_prog = 1;
 int a = 0, b;
 bool high_low = false;
-bool start_programm = false;
+bool start_programm = false, stop_programm = false;
+bool tune_programm = false;
+bool wifiOn = false;
+
 uint32_t timer = millis();
-Fouth<bool, bool, byte, byte> parametrs{false, false, 0, 255};
 
 const byte input_pin = 25;
 const byte output_pin = 26;
@@ -32,7 +36,8 @@ const byte mtrRelay = 14;
 TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButton, mtrRelay, sck, cs, so};
 
 void connectWiFi();
-void dimmer(const byte& pidValue);
+void dimmer(const byte &pidValue);
+bool wifiManager();
 
 void setup()
 {
@@ -50,9 +55,37 @@ void setup()
     {
         out = trm.getTemperature();
     };
-    thing["start programm"] << [](pson &in)
+    thing["start_programm"] << [](pson &in)
     {
+        if (in.is_empty())
+        {
+            in = stop_programm;
+        }
+        stop_programm = in ? true : false;
+    };
+    thing["stop_button"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = start_programm;
+        }
         start_programm = in ? true : false;
+    };
+    thing["Tune_settings"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = tune_programm;
+        }
+        tune_programm = in ? true : false;
+    };
+    thing["Number_programm"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = number_prog;
+        }
+        number_prog = in;
     };
 }
 
@@ -60,9 +93,18 @@ void loop()
 {
     trm.main_programm();
     dimmer(trm.getPIDvalue());
+
+    if (wifiOn)
+    {
+        trm.put_number_prog(number_prog);
+        trm.start_program_from_server(start_programm);
+        trm.stop_program_from_server(stop_programm);
+        thing.handle();
+    }
 }
 
-void dimmer(const byte& pidValue){
+void dimmer(const byte &pidValue)
+{
     a = pidValue;
     b = map(a, 0, 255, 255, 0);
 
@@ -77,11 +119,6 @@ void dimmer(const byte& pidValue){
         digitalWrite(output_pin, LOW);
         timer = millis();
         high_low = false;
-    }
-    if (trm.check_wifi())
-    {
-        thing.handle();
-        parametrs = trm.getParametrs();
     }
 }
 
@@ -113,10 +150,31 @@ void connectWiFi()
             {
                 lcd->ClearAll();
                 lcd->Connecting();
-                portalRun();
+                if (wifiManager())
+                {
+                    lcd->SuccessConection(true);
+                    wifiOn = true;
+                    delay(200);
+                }
+                else
+                {
+                    lcd->SuccessConection(false);
+                    delay(500);
+                    ESP.restart();
+                }
             }
             delete lcd, upBtn, downBtn, startBtn;
             return;
         }
     }
+}
+
+bool wifiManager()
+{
+    WiFi.mode(WIFI_STA);
+    WiFiManager wifiManager;
+    // wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
+    bool res;                             // храним переменную для подключения
+    res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
+    return res;
 }
