@@ -11,7 +11,7 @@
 
 ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
 
-byte number_prog = 1;
+byte number_prog = 1, number_prog_old = 0;
 int a = 0, b;
 bool high_low = false;
 bool start_programm = false, stop_programm = false;
@@ -59,17 +59,17 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = stop_programm;
+            in = start_programm;
         }
-        stop_programm = in ? true : false;
+        start_programm = in ? true : false;
     };
     thing["stop_button"] << [](pson &in)
     {
         if (in.is_empty())
         {
-            in = start_programm;
+            in = stop_programm;
         }
-        start_programm = in ? true : false;
+        stop_programm = in ? true : false;
     };
     thing["Tune_settings"] << [](pson &in)
     {
@@ -96,7 +96,10 @@ void loop()
 
     if (wifiOn)
     {
-        trm.put_number_prog(number_prog);
+        if(number_prog_old != number_prog){
+            trm.put_number_prog(number_prog);
+            number_prog_old = number_prog;
+        }
         trm.start_program_from_server(start_programm);
         trm.stop_program_from_server(stop_programm);
         thing.handle();

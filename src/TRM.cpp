@@ -1,7 +1,5 @@
 #include "TRM.h"
 
-#include <SimplePortal.h>
-
 TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
          const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin)
     : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
@@ -683,21 +681,23 @@ void TRM::baseParametrs()
 
 void TRM::start_program_from_server(const bool &start)
 {
-    if (start)
+    if (start && !runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.startProgramm();
+        delay(200);
         runner.putTimeSettings(timeSet, timeDelay);
         runner.putProgramm(collector.getPause(numberPause));
     }
 }
 void TRM::stop_program_from_server(const bool &stop)
 {
-    if (stop)
+    if (stop && runner.is_programm_run())
     {
         lcd.ClearAll();
         lcd.stopProgramm();
         runner.programm_stop();
+        delay(200);
     }
 }
 
