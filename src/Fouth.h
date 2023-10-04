@@ -14,7 +14,8 @@ struct Fouth
         : val_1(v1), val_2(v2), val_3(v3), val_4(v4) {}
 
     // use default values for copy construction and assignment
-
+    Fouth(){}
+    
     M first() { return val_1; }
     const M first() const { return val_1; }
 

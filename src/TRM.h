@@ -67,8 +67,11 @@ public:
     float getTemperature();
 
     // серверная часть
-    void start_program_from_server(const bool& start);
-    void stop_program_from_server(const bool& stop);
+    byte get_number_prog() const { return numberPause; }
+    void start_program_from_server(const bool &start);
+    void stop_program_from_server(const bool &stop);
     void put_number_prog(const byte &number);
-    Fouth<bool, bool, byte, byte> getParametrs() const { return Fouth<bool, bool, byte, byte>(timeSet, timeDelay, powerMax, powerMax); }
+    Fouth<bool, bool, byte, byte> getParametrs() const { return Fouth<bool, bool, byte, byte>(timeSet, timeDelay, powerMax, powerMin); }
+    void save_parametrs_time(const byte &what, const bool &value);
+    void save_parametrs_power(const byte &what, const byte &value);
 };

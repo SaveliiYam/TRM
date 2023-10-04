@@ -87,6 +87,40 @@ void setup()
         }
         number_prog = in;
     };
+    thing["Time_set"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = trm.getParametrs().first();
+        }
+        trm.save_parametrs_time(1, in);
+    };
+    thing["Time_delay"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = trm.getParametrs().second();
+        }
+        trm.save_parametrs_time(2, in);
+    };
+    thing["Power_max"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            byte a = map(trm.getParametrs().third(), 0, 255, 0, 100);
+            in = a;
+        }
+        trm.save_parametrs_power(3, in);
+    };
+    thing["Power_min"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            byte a = map(trm.getParametrs().fouth(), 0, 255, 0, 100);
+            in = a;
+        }
+        trm.save_parametrs_power(4, in);
+    };
 }
 
 void loop()
@@ -96,7 +130,8 @@ void loop()
 
     if (wifiOn)
     {
-        if(number_prog_old != number_prog){
+        if (number_prog_old != number_prog)
+        {
             trm.put_number_prog(number_prog);
             number_prog_old = number_prog;
         }

@@ -6,19 +6,15 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
 {
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
-
-    loadParametrs();
-
     termoCouple.ini(sckPin, csPin, soPin);
-
-    regulator.setLimits(powerMin, powerMax);
-
-    runner.putTimeSettings(timeSet, timeDelay);
 }
 
 void TRM::ini()
 {
     lcd.ini();
+    loadParametrs();
+    regulator.setLimits(powerMin, powerMax);
+    runner.putTimeSettings(timeSet, timeDelay);
 }
 
 float TRM::getTemperature()
@@ -511,20 +507,24 @@ void TRM::settings()
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Clicked() && runner.is_programm_run())
+    if (startStopButton.Clicked())
     {
-        lcd.ClearAll();
-        lcd.stopProgramm();
-        runner.programm_stop();
-        delay(2000);
-    }
-    if (startStopButton.Clicked() && !runner.is_programm_run())
-    {
-        lcd.ClearAll();
-        lcd.startProgramm();
-        runner.putTimeSettings(timeSet, timeDelay);
-        runner.putProgramm(collector.getPause(numberPause));
-        delay(1000);
+        if (runner.is_programm_run())
+        {
+            lcd.ClearAll();
+            lcd.stopProgramm();
+            runner.programm_stop();
+            delay(1000);
+            printMainMenu(1);
+        }
+        else
+        {
+            lcd.ClearAll();
+            lcd.startProgramm();
+            runner.putTimeSettings(timeSet, timeDelay);
+            runner.putProgramm(collector.getPause(numberPause));
+            delay(1000);
+        }
     }
 }
 
@@ -645,6 +645,8 @@ void TRM::tuningPID()
 void TRM::saveParametrs()
 {
     parametrs param{timeSet, timeDelay, powerMax, powerMin};
+    regulator.setLimits(powerMin, powerMax);
+    runner.putTimeSettings(timeSet, timeDelay);
     EEPROM.put(250, param);
     EEPROM.commit();
 }
@@ -698,6 +700,7 @@ void TRM::stop_program_from_server(const bool &stop)
         lcd.stopProgramm();
         runner.programm_stop();
         delay(200);
+        printMainMenu(10);
     }
 }
 
@@ -706,3 +709,40 @@ void TRM::put_number_prog(const byte &number)
     numberPause = number;
     numberPause--;
 }
+
+void TRM::save_parametrs_time(const byte &what, const bool &value)
+    {
+        switch (what)
+        {
+        case 1:
+        {
+            timeSet = value;
+            break;
+        }
+        case 2:
+        {
+            timeDelay = value;
+            break;
+        }
+        }
+        saveParametrs();
+    }
+    void TRM::save_parametrs_power(const byte &what, const byte &value)
+    {
+        switch (what)
+        {
+        case 3:
+        {
+            byte a = map(value, 0, 100, 0, 255);
+            powerMax = a;
+            break;
+        }
+        case 4:
+        {
+            byte a = map(value, 0, 100, 0, 255);
+            powerMin = a;
+            break;
+        }
+        }
+        saveParametrs();
+    }
