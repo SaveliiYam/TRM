@@ -7,7 +7,6 @@
 #include "Pair.h"
 #include "Third.h"
 
-
 class PIDRegulator
 {
 private:
@@ -16,21 +15,25 @@ private:
     PIDtuner tuner;
     bool tune = false;
     Pair<byte, byte> parametrsForLCD{0, 0};
+
 public:
     PIDRegulator();
 
-    //Надо каждый раз вводить лимиты
-    void setLimits(const byte &minValue, const byte &maxValue) { regulator.setLimits(minValue, maxValue); }
-    //Получить значение
+    // Надо каждый раз вводить лимиты
+    void setLimits(const byte &minValue, const byte &maxValue)
+    {
+        regulator.setLimits(map(minValue, 0, 100, 0, 255), map(maxValue, 0, 100, 0, 255));
+    }
+    // Получить значение
     int getValuePID(const int &temperatureNow);
-    //Внести температуру уставки
-    void putTemperature(const int& setTemperature);
-    //Надо вызывать перед каждым тюном
+    // Внести температуру уставки
+    void putTemperature(const int &setTemperature);
+    // Надо вызывать перед каждым тюном
     void tuneInitialization(const float &temperatureNeed);
-    //тюн
+    // тюн
     Third<bool, byte, byte> tunePID(const float &temperatureNow);
-    Pair<byte, byte> GetPIDValueTune(const float& temperatureNow);
-    //вставить коэффициенты в регулятор
+    Pair<byte, byte> GetPIDValueTune(const float &temperatureNow);
+    // вставить коэффициенты в регулятор
     void enterPIDKoefficients(const Koefficients &koefficients);
     //
     void loadKoefficients();
@@ -39,4 +42,3 @@ public:
     bool getTuneInfo() const;
     Pair<byte, byte> GetParametrsLCD() const;
 };
-

@@ -260,8 +260,6 @@ void LCD::TimeSettings(const bool &parametr)
 
 void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit)
 {
-    byte min = map(minLimit, 0, 255, 0, 100);
-    byte max = map(maxLimit, 0, 255, 0, 100);
     if (parametr)
     {
         Point(1);
@@ -276,30 +274,29 @@ void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &ma
     lcd.setCursor(1, 1);
     // lcd.print("minLimit: ");
     lcd.print("M\xB8\xBD\xB8\xBC\x79\xBC:  ");
-    lcd.print(min);
+    lcd.print(minLimit);
     lcd.print('%');
     lcd.setCursor(1, 2);
     // lcd.print("maxLimit: ");
     lcd.print("Ma\xBA\x63\xB8\xBC\x79\xBC: ");
-    lcd.print(max);
+    lcd.print(maxLimit);
     lcd.print('%');
 }
 
 void LCD::PrintLimitMenu(const bool &parametr, const byte &limit)
 {
-    byte lim = map(limit, 0, 255, 0, 100);
     lcd.setCursor(1, 0);
     if (parametr)
     {
         // lcd.print("MinLimit: ");
         lcd.print("M\xB8\xBD\xB8\xBC\x79\xBC:  ");
-        lcd.print(lim);
+        lcd.print(limit);
     }
     else
     {
         // lcd.print("maxLimit: ");
         lcd.print("Ma\xBA\x63\xB8\xBC\x79\xBC: ");
-        lcd.print(lim);
+        lcd.print(limit);
     }
     lcd.print('%');
 }
@@ -390,15 +387,19 @@ void LCD::Clear(const byte &curs)
     lcd.print("                    ");
 }
 
-void LCD::TuneBaseSettings(const bool &parametr)
+void LCD::TuneBaseSettings(const byte &parametr)
 {
-    if (parametr)
+    if (parametr == 1)
     {
         Point(1);
     }
-    else
+    else if (parametr == 2)
     {
         Point(2);
+    }
+    else
+    {
+        Point(3);
     }
     lcd.setCursor(0, 0);
     // lcd.print("Other settings");
@@ -409,8 +410,10 @@ void LCD::TuneBaseSettings(const bool &parametr)
     lcd.setCursor(1, 2);
     // lcd.print("Tune Settings");
     lcd.print("H\x61\x63\xBF\x70\x6F\xB9\xBA\xB8\x20\xA8\xA5\xE0");
+    lcd.setCursor(1, 3);
+    lcd.print("Ka\xBB\xB8\xB2\x70\x6F\xB3\xBA\x61");
 }
-void LCD::TuneBaseSettings(const bool &parametr, const bool &choise)
+void LCD::TuneBaseSettings(const byte &parametr, const bool &choise)
 {
     lcd.setCursor(0, 0);
     if (parametr)
@@ -439,6 +442,14 @@ void LCD::TuneBaseSettings(const bool &parametr, const bool &choise)
     lcd.print(yes);
     lcd.setCursor(1, 3);
     lcd.print(no);
+}
+
+void LCD::TuneBaseSettings(const byte &parametr, const float &calib){
+    lcd.setCursor(0,0);
+    lcd.print("Ka\xBB\xB8\xB2\x70\x6F\xB3\xBA\x61");
+    lcd.setCursor(1,1);
+    lcd.print("\xA4\xBD\x61\xC0\x65\xBD\xB8\x65: ");
+    lcd.print(calib);
 }
 
 void LCD::Tuning(const byte &temperatureMax)
@@ -476,7 +487,7 @@ void LCD::SuccessConection(const bool &status)
     else
     {
         lcd.print("He \xBe\x6F\xBB\x79\xC0\xB8\xBB\x6F\x63\xC4");
-        lcd.setCursor(0,2);
+        lcd.setCursor(0, 2);
         lcd.print("\xA8\x65\x70\x65\xB7\x61\xB4\x70\x79\xB7\xBA\x61");
     }
 }

@@ -15,11 +15,22 @@ void TRM::ini()
     loadParametrs();
     regulator.setLimits(powerMin, powerMax);
     runner.putTimeSettings(timeSet, timeDelay);
+    termoCouple.Calibration(calib_value);
 }
 
 float TRM::getTemperature()
 {
     return termoCouple.ReadCelsius();
+}
+
+float TRM::getCalibrationValue() const{
+    return termoCouple.GetCalibValue();
+}
+
+void TRM::enterCalibrationValue(const float& value){
+    calib_value = value;
+    termoCouple.Calibration(calib_value);
+    saveParametrs();
 }
 
 byte TRM::getNumberPause() const { return numberPause; }
@@ -95,7 +106,6 @@ void TRM::enterTemperaturePauses()
                         time1 = 7200;
                     }
                 }
-                Serial.println(time1);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
             }
@@ -116,7 +126,6 @@ void TRM::enterTemperaturePauses()
                         time1 = 7200;
                     }
                 }
-                Serial.println(time1);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
             }
@@ -125,17 +134,11 @@ void TRM::enterTemperaturePauses()
         if (timeSet)
         {
             pauseEnter.time[i] = time1 * 1000;
-            // pauseEnter.time[i] = time1;
-            Serial.println("sec");
         }
         else if (!timeSet)
         {
             pauseEnter.time[i] = time1 * 60000;
-            // pauseEnter.time[i] = time1;
-            Serial.println("min");
         }
-        Serial.print("Time: ");
-        Serial.println(time1);
     }
     collector.writePauses(numberPause, pauseEnter);
     delete downButton, upButton;
@@ -162,28 +165,6 @@ void TRM::settings()
                 printSettings = false;
                 lcd.ClearAll();
                 lcd.settingsMainMenu(whatMenu);
-            }
-            // Чтобы зайти в базовые настройки надо зажать клавищу с мотором
-            if (motorButton.Pressed())
-            {
-                bool parametr = false;
-                lcd.ClearAll();
-                lcd.BaseSettings(parametr);
-                while (1)
-                {
-                    if (upButton->Clicked() || downButton->Clicked())
-                    {
-                        parametr = true ? false : true;
-                        lcd.ClearAll();
-                        lcd.BaseSettings(parametr);
-                    }
-                    if (settingsButton.Clicked())
-                    {
-                        if (parametr)
-                            baseParametrs();
-                        break;
-                    }
-                }
             }
             if (settingsButton.Pressed())
             {
@@ -255,7 +236,7 @@ void TRM::settings()
                 case 1: // тюн и базовые
                 {
                     printSettings = true;
-                    bool parametrChoice = false;
+                    byte parametrChoice = 1;
                     lcd.ClearAll();
                     lcd.TuneBaseSettings(parametrChoice);
                     while (1)
@@ -264,16 +245,17 @@ void TRM::settings()
                         {
                             break;
                         }
-                        if (upButton->Clicked() || downButton->Clicked())
+                        if (upButton->Clicked())
                         {
-                            if (parametrChoice)
-                            {
-                                parametrChoice = false;
-                            }
-                            else
-                            {
-                                parametrChoice = true;
-                            }
+                            parametrChoice++;
+                            if(parametrChoice == 4){parametrChoice = 1;}
+                            lcd.ClearAll();
+                            lcd.TuneBaseSettings(parametrChoice);
+                        }
+                        if (downButton->Clicked())
+                        {
+                            parametrChoice--;
+                            if(parametrChoice == 0){parametrChoice = 3;}
                             lcd.ClearAll();
                             lcd.TuneBaseSettings(parametrChoice);
                         }
@@ -281,8 +263,11 @@ void TRM::settings()
                         {
                             bool yes_no = false;
                             lcd.ClearAll();
-                            lcd.TuneBaseSettings(parametrChoice, yes_no);
-                            while (1)
+                            if(parametrChoice != 3)
+                                lcd.TuneBaseSettings(parametrChoice, yes_no);
+                            else
+                                lcd.TuneBaseSettings(parametrChoice, calib_value);
+                            while (1 && parametrChoice != 3)
                             {
                                 if (settingsButton.Clicked())
                                 {
@@ -298,13 +283,11 @@ void TRM::settings()
                                     else if (yes_no && !parametrChoice)
                                     { // т.н
                                         tuningPID();
-                                        Serial.println("Tune");
                                         break;
                                     }
                                     else if (yes_no && parametrChoice)
                                     {
                                         baseParametrs();
-                                        Serial.println("base");
                                     }
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice);
@@ -324,6 +307,26 @@ void TRM::settings()
                                     lcd.TuneBaseSettings(parametrChoice, yes_no);
                                 }
                             }
+                            while (1 && parametrChoice == 3)
+                            {
+                                if (settingsButton.Clicked() || startStopButton.Clicked())
+                                {
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice);
+                                    break;
+                                }
+                                if(upButton->Clicked()){
+                                    calib_value += 0.10;
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice, calib_value);
+                                }
+                                if(downButton->Clicked()){
+                                    calib_value -= 0.10;
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice, calib_value);
+                                }
+                            }
+                            
                         }
                     }
                 }
@@ -381,13 +384,21 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMin += 2;
+                                        powerMin++;
+                                        if (powerMin > 100)
+                                        {
+                                            powerMin = 100;
+                                        }
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMin -= 2;
+                                        powerMin--;
+                                        if (powerMin == 255)
+                                        {
+                                            powerMin = 0;
+                                        }
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
@@ -396,13 +407,21 @@ void TRM::settings()
                                 {
                                     if (upButton->Clicked())
                                     {
-                                        powerMax += 2;
+                                        powerMax++;
+                                        if (powerMax > 100)
+                                        {
+                                            powerMax = 100;
+                                        }
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
                                     if (downButton->Clicked())
                                     {
-                                        powerMax -= 2;
+                                        powerMax--;
+                                        if (powerMax == 255)
+                                        {
+                                            powerMax = 0;
+                                        }
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
@@ -469,8 +488,6 @@ void TRM::settings()
                                     {
                                         timeSet = true;
                                     }
-                                    // Serial.print("timeSet: ");
-                                    // Serial.println(timeSet);
                                     lcd.ClearAll();
                                     lcd.TimeConcrete(parametrTime, timeSet);
                                 }
@@ -500,6 +517,7 @@ void TRM::settings()
             }
         }
         saveParametrs();
+        termoCouple.Calibration(calib_value);
         delete upButton, downButton;
         lcd.ClearAll();
     }
@@ -644,7 +662,7 @@ void TRM::tuningPID()
 
 void TRM::saveParametrs()
 {
-    parametrs param{timeSet, timeDelay, powerMax, powerMin};
+    parametrs param{timeSet, timeDelay, powerMax, powerMin, calib_value};
     regulator.setLimits(powerMin, powerMax);
     runner.putTimeSettings(timeSet, timeDelay);
     EEPROM.put(250, param);
@@ -658,15 +676,17 @@ void TRM::loadParametrs()
     timeDelay = param._timeDelay;
     powerMax = param._powerMax;
     powerMin = param._powerMin;
+    calib_value = param._calibr;
 }
 void TRM::baseParametrs()
 {
-    parametrs param(false, false, 255, 0);
+    parametrs param(false, false, 255, 0, 0.0);
     EEPROM.put(250, param);
     timeSet = param._timeSet;
     timeDelay = param._timeDelay;
     powerMax = param._powerMax;
     powerMin = param._powerMin;
+    calib_value = param._calibr;
     runner.putTimeSettings(timeSet, timeDelay);
     regulator.setLimits(powerMin, powerMax);
     regulator.baseKoefficients();
@@ -687,7 +707,7 @@ void TRM::start_program_from_server(const bool &start)
     {
         lcd.ClearAll();
         lcd.startProgramm();
-        delay(200);
+        delay(500);
         runner.putTimeSettings(timeSet, timeDelay);
         runner.putProgramm(collector.getPause(numberPause));
     }
@@ -699,7 +719,7 @@ void TRM::stop_program_from_server(const bool &stop)
         lcd.ClearAll();
         lcd.stopProgramm();
         runner.programm_stop();
-        delay(200);
+        delay(500);
         printMainMenu(10);
     }
 }
@@ -711,38 +731,36 @@ void TRM::put_number_prog(const byte &number)
 }
 
 void TRM::save_parametrs_time(const byte &what, const bool &value)
+{
+    switch (what)
     {
-        switch (what)
-        {
-        case 1:
-        {
-            timeSet = value;
-            break;
-        }
-        case 2:
-        {
-            timeDelay = value;
-            break;
-        }
-        }
-        saveParametrs();
-    }
-    void TRM::save_parametrs_power(const byte &what, const byte &value)
+    case 1:
     {
-        switch (what)
-        {
-        case 3:
-        {
-            byte a = map(value, 0, 100, 0, 255);
-            powerMax = a;
-            break;
-        }
-        case 4:
-        {
-            byte a = map(value, 0, 100, 0, 255);
-            powerMin = a;
-            break;
-        }
-        }
-        saveParametrs();
+        timeSet = value;
+        break;
     }
+    case 2:
+    {
+        timeDelay = value;
+        break;
+    }
+    }
+    saveParametrs();
+}
+void TRM::save_parametrs_power(const byte &what, const byte &value)
+{
+    switch (what)
+    {
+    case 3:
+    {
+        powerMax = value;
+        break;
+    }
+    case 4:
+    {
+        powerMin = value;
+        break;
+    }
+    }
+    saveParametrs();
+}

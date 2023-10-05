@@ -38,6 +38,8 @@ private:
     bool timeSet = false;   // переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false; // переменная связанная с отложенным временем
 
+    float calib_value = 0;
+
     LCD lcd;
     PIDRegulator regulator;
 
@@ -63,9 +65,11 @@ public:
     void ini();
     void main_programm();
     byte getPIDvalue();
-    byte getPIDvalueTune();
+    byte getPIDvalueTune() const;
     float getTemperature();
-
+    float getCalibrationValue() const;
+    void enterCalibrationValue(const float& value);
+    
     // серверная часть
     byte get_number_prog() const { return numberPause; }
     void start_program_from_server(const bool &start);

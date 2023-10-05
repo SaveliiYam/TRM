@@ -58,7 +58,7 @@ float MyThermoCouple::ReadCelsius(void)
 
     temperature = v * 0.25;
   }
-  return temperature;
+  return temperature + calib_value;
 }
 
 float MyThermoCouple::ReadFahrenheit(void) { return ReadCelsius() * 9.0 / 5.0 + 32; }
@@ -83,4 +83,11 @@ byte MyThermoCouple::spiread(void)
   }
 
   return d;
+}
+
+void MyThermoCouple::Calibration(const float& value){
+  calib_value = value;
+}
+float MyThermoCouple::GetCalibValue() const{
+  return calib_value;
 }

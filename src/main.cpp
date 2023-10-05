@@ -107,8 +107,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            byte a = map(trm.getParametrs().third(), 0, 255, 0, 100);
-            in = a;
+            in = trm.getParametrs().third();
         }
         trm.save_parametrs_power(3, in);
     };
@@ -116,10 +115,13 @@ void setup()
     {
         if (in.is_empty())
         {
-            byte a = map(trm.getParametrs().fouth(), 0, 255, 0, 100);
-            in = a;
+            in = trm.getParametrs().fouth();
         }
         trm.save_parametrs_power(4, in);
+    };
+    thing["Calibration_temperature"] << [](pson& in){
+        if(in.is_empty()){in = trm.getCalibrationValue();}
+        trm.enterCalibrationValue(in);
     };
 }
 

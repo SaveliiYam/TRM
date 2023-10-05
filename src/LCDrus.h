@@ -48,8 +48,9 @@ public:
     void mainMenu(const int &temperature, const byte &number);
     void mainMenu(const int &temperature, const byte &number, const byte max, const byte &min, const bool &delay, const bool &set);
     void workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const char *timeParametr);
-    void TuneBaseSettings(const bool &parametr);
-    void TuneBaseSettings(const bool &parametr, const bool &choise);
+    void TuneBaseSettings(const byte &parametr);
+    void TuneBaseSettings(const byte &parametr, const bool &choise);
+    void TuneBaseSettings(const byte &parametr, const float &calib);
     void Tuning(const byte &temperatureMax);
     void TuningProcces(const byte &percent, const byte &temperatureNow);
     void SuccessConection(const bool& status);
