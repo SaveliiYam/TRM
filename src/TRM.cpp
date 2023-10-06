@@ -66,7 +66,7 @@ void TRM::enterTemperaturePauses()
             // time1 = pauseEnter.time[i]; //показывает время в мс
         }
         lcd.ClearAll();
-        lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1);
+        lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
         while (!startStopButton.Clicked())
         { // ввод температуры
             if (settingsButton.Clicked())
@@ -79,17 +79,17 @@ void TRM::enterTemperaturePauses()
             {
                 temp1--;
                 lcd.ClearAll();
-                lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1);
+                lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
             }
             if (upButton->Clicked())
             {
                 temp1++;
                 lcd.ClearAll();
-                lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1);
+                lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
             }
         }
         lcd.ClearAll();
-        lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
+        lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1, timeSet);
         while (!startStopButton.Clicked())
         { // ввод времени
             if (settingsButton.Clicked())
@@ -103,20 +103,20 @@ void TRM::enterTemperaturePauses()
                 time1--;
                 if (!timeSet)
                 {
-                    if (time1 > 120 || time1 < 0)
+                    if (time1 >= 120 || time1 < 0)
                     {
-                        time1 = 0;
+                        time1 = 120;
                     }
                 }
                 else
                 {
-                    if (time1 > 7200 || time1 < 0)
+                    if (time1 >= 7200 || time1 < 0)
                     {
                         time1 = 7200;
                     }
                 }
                 lcd.ClearAll();
-                lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
+                lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1, timeSet);
             }
             if (upButton->Clicked())
             {
@@ -125,18 +125,18 @@ void TRM::enterTemperaturePauses()
                 {
                     if (time1 > 120)
                     {
-                        time1 = 120;
+                        time1 = 0;
                     }
                 }
                 else
                 {
                     if (time1 > 7200)
                     {
-                        time1 = 7200;
+                        time1 = 0;
                     }
                 }
                 lcd.ClearAll();
-                lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1);
+                lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1, timeSet);
             }
         }
         pauseEnter.setpointTemperature[i] = temp1;

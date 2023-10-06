@@ -41,7 +41,7 @@ public:
     void TimeSettings(const bool &parametr);
     void TimeConcrete(const bool &parametr, const bool &value);
     void NumberProg(const byte &numberProgramm);
-    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
+    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time, const bool& parametrTime);
     void BaseSettings(const bool &parametr);
     void stopProgramm();
     void startProgramm();

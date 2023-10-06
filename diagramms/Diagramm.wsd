@@ -4,16 +4,21 @@ struct temperaturePausesStruct{
     int16_t time[6]
 }
 
-struct parametrs{
-    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin)
-    parametrs(){}
-    bool _timeSet = false
-    bool _timeDelay = false
-    byte _powerMax = 255, _powerMin = 0
-}
+struct parametrs
+{
+    parametrs(const bool &timeSet, const bool &timeDelay, const byte &powerMax, const byte &powerMin, const float &calibr, const byte &predel);
+    parametrs() {}
+    bool _timeSet;
+    bool _timeDelay;
+    byte _powerMax = 255, _powerMin = 0, _predel = 101;
+    float _calibr = 0;
+};
 
 class LCD{
     LCD();
+    void ini();
+    void ConnectToWifi(const bool &connect);
+    void Connecting();
     void ClearAll();
     void WriteOnLcdPause(const Pair<byte, uint16_t> &pause, const byte &numberPause);
     void WriteTemperature(const float &temperature);
@@ -21,49 +26,80 @@ class LCD{
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
     void WiFi(const bool &parametr);
-    void PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit);
+    void PowerLimits(const byte &parametr, const byte &minLimit, const byte &maxLimit, const byte& limitTemp);
+    void PrintLimitMenu(const byte &parametr, const byte &limit);
     void TimeSettings(const bool &parametr);
     void TimeConcrete(const bool &parametr, const bool &value);
-    void NumberProg(byte numberProgramm);
-    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time);
+    void NumberProg(const byte &numberProgramm);
+    void EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time, const bool& parametrTime);
     void BaseSettings(const bool &parametr);
     void stopProgramm();
     void startProgramm();
-    void mainMenu(const float &temperature, const byte &number);
+    void mainMenu(const int &temperature, const byte &number);
+    void mainMenu(const int &temperature, const byte &number, const byte max, const byte &min, const bool &delay, const bool &set);
+    void workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const bool& timeParametr);
+    void TuneBaseSettings(const byte &parametr);
+    void TuneBaseSettings(const byte &parametr, const bool &choise);
+    void TuneBaseSettings(const byte &parametr, const float &calib);
+    void Tuning(const byte &temperatureMax);
+    void TuningProcces(const byte &percent, const byte &temperatureNow);
+    void SuccessConection(const bool& status);
 }
 
 class TRM{
     byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
-    byte powerMax, powerMin;//переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
+    byte predel_temperature = 101;
+
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
     MyButton settingsButton, startStopButton, motorButton;
     MyThermoCouple termoCouple;
-    bool timeSet = false; //переменная связанная со временем, она должна загружаться из EEprom (false == min)
-    bool timeDelay = false;//переменная связанная с отложенным временем
-    bool wifiOn = false, _motorState = false;
+
+    bool timeSet = false;
+    bool timeDelay = false;
+
+    float calib_value = 0;
+
     LCD lcd;
     PIDRegulator regulator;
-    TRM(const byte& dwnBtn, const byte& upBtn, const byte& setBtn, const byte& strtBtn,
-        const byte& nmbBtn, const byte& mtrBtn, const byte& mtrPin , const byte& sckPin, const byte& csPin, const byte& soPin);
+    TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
+        const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin);
+
+    void ini();
+    void main_programm();
+    byte getPIDvalue();
+    byte getPIDvalueTune() const;
     float getTemperature();
+    float getCalibrationValue() const;
+    void enterCalibrationValue(const float &value);
+    byte getPredelTemperature() const;
+    void enterPredelTemperature(const byte &predel);
+    byte get_number_prog() const { return numberPause; }
+    void start_program_from_server(const bool &start);
+    void stop_program_from_server(const bool &stop);
+    void put_number_prog(const byte &number);
+    Fouth<bool, bool, byte, byte> getParametrs() const;
+    void save_parametrs_time(const byte &what, const bool &value);
+    void save_parametrs_power(const byte &what, const byte &value);
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
     void motorOn();
     void startProgramm();
     void runningProgramm();
-    void printMainMenu(const float& temperatureNew);
-    void WiFiConnect(); //Подключение к wifi
+    void tunningProgramm();
+    void printMainMenu(const int &temperatureNew);
+    void WiFiConnect(); // Подключение к wifi
     void saveParametrs();
     void loadParametrs();
     void baseParametrs();
-    void chooseNumberPause();void main_programm();
-    byte getPIDvalue();
+    void chooseNumberPause();
+    void tuningPID();
+};
 }
 
 class TemperatureProgramm{
-    temperaturePausesStruct _pausesStruct
+    temperaturePausesStruct _pausesStruct;
     TemperatureProgramm(const temperaturePausesStruct& pauses)//создание объекта, хранящего только структуру
     TemperatureProgramm(const int& adress)//создание обекта с ячейкой (чтобы он прочитал прог-му из ячейки)
     Pair<byte, uint16_t> readPause(const byte& pause)//получить паузу из программы
@@ -75,9 +111,9 @@ class TemperatureProgramm{
 }
 
 class TemperaturePauseCollector{
-    byte _numberProgramms[3] = {0, 1, 2}//номера температурных программ
-    int _adress[3]//ячейки в которые будут записываться паузы
-    TemperaturePauseCollector()
+    byte _numberProgramms[7] = {0, 1, 2, 3, 4, 5, 6};
+    byte _adress[7] = {0, 35, 70, 105, 140, 175, 210};
+    TemperaturePauseCollector();
     void writePauses(const byte& numberProgramm, const temperaturePausesStruct& pause) //запись программы под номером и передача стр-ры в программу
     Pair<byte, uint16_t> readPause(const byte& numberProgramm, const byte& numberPause)//получить одну паузу и программы
     temperaturePausesStruct getPause(const byte& numberProgramm)//получить программу полностью
@@ -96,14 +132,14 @@ class ProgrammRunner{
     ProgrammRunner(const temperaturePausesStruct &programm, const bool &time, const bool &delay);
     ProgrammRunner(const bool &time, const bool &delay);
     ProgrammRunner();
-    void putTimeSet(const bool &time) { timeSet = time; }
-    void putTimeDelay(const bool &delay) { timeDelay = delay; }
-    void putTimeSettings(const bool &time, const bool &delay)
-    void putProgramm(const temperaturePausesStruct &programm)
-    bool is_programm_run() // если программа закончена, то false
+    void putTimeSet(const bool &time);
+    void putTimeDelay(const bool &delay);
+    void putTimeSettings(const bool &time, const bool &delay);
+    void putProgramm(const temperaturePausesStruct &programm);
+    bool is_programm_run() const;
     void programm_stop();
     void startPause();
-    Pair<byte, uint16_t> runningProgramm(const float &temperature)
+    Third<byte, uint32_t, byte> runningProgramm(const float &temperature);
 }
 
 
@@ -153,13 +189,18 @@ class MyButton{
 }
 
 class MyThermoCouple{
-    byte _sck, _so, _cs;
-    uint8_t spiread(void);
-    uint32_t _tmr = millis;
+    byte sck, so, cs;
+    float calib_value = 0;
+    uint8_t spiread();
+    uint32_t _tmr = millis();
+    MyThermoCouple(const byte& SCK, const byte& CS, const byte& SO);
     MyThermoCouple();
-    void ini(byte SCK, byte CS, byte SO);
-    float readCelsius();
-    float readFarenheit();
+    void ini(const byte& SCK, const byte& CS, const byte& SO);
+    float ReadCelsius();
+    float ReadFahrenheit();
+    float ReadFarenheit();
+    void Calibration(const float& value);
+    float GetCalibValue() const;
 }
 TRM--*ProgrammRunner
 TRM--*LCD : создает

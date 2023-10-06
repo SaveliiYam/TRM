@@ -158,7 +158,7 @@ void LCD::BaseSettings(const bool &parametr)
     lcd.print(yes);
 }
 
-void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time)
+void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time, const bool& parametrTime)
 {
     NumberProg(numberProgramm);
     lcd.setCursor(0, 1);
@@ -179,6 +179,11 @@ void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &para
     // lcd.print("Set time: ");
     lcd.print("Bpe\xBC\xC7: ");
     lcd.print(time);
+    if(parametrTime){
+        lcd.print(" ce\xBa");
+    }
+    else{lcd.print(" \xBC\xB8\xBD");}
+    lcd.print(probel);
 }
 void LCD::Connecting()
 {
