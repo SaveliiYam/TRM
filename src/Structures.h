@@ -10,31 +10,28 @@
     140 - 4 pause
     175 - 5 pause
     210 - 6 pause
-    
+
     250 - TRM
 
     500 - PIDKoefficients
 */
 
-struct temperaturePausesStruct{ //30 byte + 10byte
-    byte setpointTemperature[6]; //1 byte
-    uint32_t time[6];            //4 byte
+struct temperaturePausesStruct
+{                                // 30 byte + 10byte
+    byte setpointTemperature[6]; // 1 byte
+    uint32_t time[6];            // 4 byte
 };
 
-struct parametrs{
-    parametrs(const bool& timeSet, const bool& timeDelay, const byte& powerMax, const byte& powerMin, const float& calibr)
-            : _timeSet(timeSet)
-            , _timeDelay(timeDelay)
-            , _powerMax(powerMax)
-            , _powerMin(powerMin) 
-            , _calibr(calibr) {}
-    parametrs(){}
+struct parametrs
+{
+    parametrs(const bool &timeSet, const bool &timeDelay, const byte &powerMax, const byte &powerMin, const float &calibr, const byte &predel)
+        : _timeSet(timeSet), _timeDelay(timeDelay), _powerMax(powerMax), _powerMin(powerMin), _calibr(calibr), _predel(predel) {}
+    parametrs() {}
     bool _timeSet;
     bool _timeDelay;
-    byte _powerMax = 255, _powerMin = 0;
+    byte _powerMax = 255, _powerMin = 0, _predel = 101;
     float _calibr = 0;
 };
-
 
 struct Koefficients
 {

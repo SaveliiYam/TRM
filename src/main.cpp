@@ -119,9 +119,21 @@ void setup()
         }
         trm.save_parametrs_power(4, in);
     };
-    thing["Calibration_temperature"] << [](pson& in){
-        if(in.is_empty()){in = trm.getCalibrationValue();}
+    thing["Calibration_temperature"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = trm.getCalibrationValue();
+        }
         trm.enterCalibrationValue(in);
+    };
+    thing["Predel_temperature"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            in = trm.getPredelTemperature();
+        }
+        trm.enterPredelTemperature(in);
     };
 }
 

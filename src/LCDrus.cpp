@@ -57,12 +57,13 @@ void LCD::ConnectToWifi(const bool &connect)
     lcd.print(no); // no
 }
 
-void LCD::workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const char *timeParametr)
+void LCD::workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const bool &timeParametr)
 {
     lcd.setCursor(0, 0);
     lcd.print("\xA9\x63\xBF\x61\xB3\xBA\x61"
               ": "); // setpoint
     lcd.print(setpointTemperature);
+    lcd.print(probel);
     lcd.print(probel);
     lcd.setCursor(0, 1);
     lcd.print("\x54\x65\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61"
@@ -73,7 +74,14 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
     lcd.print("Bpe\xBC\xC7"
               ": "); // time
     lcd.print(time);
-    lcd.print(timeParametr);
+    if (timeParametr)
+    {
+        lcd.print(" ce\xBA     ");
+    }
+    else
+    {
+        lcd.print(" \xBC\xB8\xBD    ");
+    }
     lcd.setCursor(0, 3);
     lcd.print("\xA8\x61\x79\xB7\x61"
               ": "); // pause
@@ -258,15 +266,19 @@ void LCD::TimeSettings(const bool &parametr)
     lcd.print("\xA4\x61\xE3\x65\x70\xB6\xBA\x61\x20\xB3\x70\x65\xBC\x65\xBD\xB8");
 }
 
-void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit)
+void LCD::PowerLimits(const byte &parametr, const byte &minLimit, const byte &maxLimit, const byte &limitTemp)
 {
-    if (parametr)
+    if (parametr == 1)
     {
         Point(1);
     }
-    else
+    else if (parametr == 2)
     {
         Point(2);
+    }
+    else
+    {
+        Point(3);
     }
     lcd.setCursor(0, 0);
     // lcd.print("Power limits:");
@@ -281,24 +293,33 @@ void LCD::PowerLimits(const bool &parametr, const byte &minLimit, const byte &ma
     lcd.print("Ma\xBA\x63\xB8\xBC\x79\xBC: ");
     lcd.print(maxLimit);
     lcd.print('%');
+    lcd.setCursor(1, 3);
+    lcd.print("\xA8\x70\x65\xE3\x65\xBB \xBF\x65\xBC\xBE: ");
+    lcd.print(limitTemp);
 }
 
-void LCD::PrintLimitMenu(const bool &parametr, const byte &limit)
+void LCD::PrintLimitMenu(const byte &parametr, const byte &limit)
 {
     lcd.setCursor(1, 0);
-    if (parametr)
+    if (parametr == 1)
     {
         // lcd.print("MinLimit: ");
         lcd.print("M\xB8\xBD\xB8\xBC\x79\xBC:  ");
         lcd.print(limit);
+        lcd.print('%');
     }
-    else
+    else if (parametr == 2)
     {
         // lcd.print("maxLimit: ");
         lcd.print("Ma\xBA\x63\xB8\xBC\x79\xBC: ");
         lcd.print(limit);
+        lcd.print('%');
     }
-    lcd.print('%');
+    else
+    {
+        lcd.print("\xA8\x70\x65\xE3\x65\xBB \xBF\x65\xBC\xBE: ");
+        lcd.print(limit);
+    }
 }
 
 void LCD::WiFi(const bool &parametr)
@@ -444,10 +465,11 @@ void LCD::TuneBaseSettings(const byte &parametr, const bool &choise)
     lcd.print(no);
 }
 
-void LCD::TuneBaseSettings(const byte &parametr, const float &calib){
-    lcd.setCursor(0,0);
+void LCD::TuneBaseSettings(const byte &parametr, const float &calib)
+{
+    lcd.setCursor(0, 0);
     lcd.print("Ka\xBB\xB8\xB2\x70\x6F\xB3\xBA\x61");
-    lcd.setCursor(1,1);
+    lcd.setCursor(1, 1);
     lcd.print("\xA4\xBD\x61\xC0\x65\xBD\xB8\x65: ");
     lcd.print(calib);
 }

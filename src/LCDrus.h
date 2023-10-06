@@ -36,8 +36,8 @@ public:
     const void ClearLcd() { lcd.clear(); }
     void settingsMainMenu(const byte &parametr);
     void WiFi(const bool &parametr);
-    void PowerLimits(const bool &parametr, const byte &minLimit, const byte &maxLimit);
-    void PrintLimitMenu(const bool &parametr, const byte &limit);
+    void PowerLimits(const byte &parametr, const byte &minLimit, const byte &maxLimit, const byte& limitTemp);
+    void PrintLimitMenu(const byte &parametr, const byte &limit);
     void TimeSettings(const bool &parametr);
     void TimeConcrete(const bool &parametr, const bool &value);
     void NumberProg(const byte &numberProgramm);
@@ -47,7 +47,7 @@ public:
     void startProgramm();
     void mainMenu(const int &temperature, const byte &number);
     void mainMenu(const int &temperature, const byte &number, const byte max, const byte &min, const bool &delay, const bool &set);
-    void workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const char *timeParametr);
+    void workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const bool& timeParametr);
     void TuneBaseSettings(const byte &parametr);
     void TuneBaseSettings(const byte &parametr, const bool &choise);
     void TuneBaseSettings(const byte &parametr, const float &calib);

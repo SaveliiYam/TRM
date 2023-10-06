@@ -29,7 +29,9 @@ class TRM
 {
 private:
     byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
-    byte powerMax, powerMin; // переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
+    byte powerMax = 0, powerMin = 0; // переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
+    byte predel_temperature = 101;
+
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
     MyButton settingsButton, startStopButton, motorButton;
@@ -68,8 +70,10 @@ public:
     byte getPIDvalueTune() const;
     float getTemperature();
     float getCalibrationValue() const;
-    void enterCalibrationValue(const float& value);
-    
+    void enterCalibrationValue(const float &value);
+    byte getPredelTemperature() const;
+    void enterPredelTemperature(const byte &predel);
+
     // серверная часть
     byte get_number_prog() const { return numberPause; }
     void start_program_from_server(const bool &start);

@@ -23,13 +23,22 @@ float TRM::getTemperature()
     return termoCouple.ReadCelsius();
 }
 
-float TRM::getCalibrationValue() const{
+float TRM::getCalibrationValue() const
+{
     return termoCouple.GetCalibValue();
 }
 
-void TRM::enterCalibrationValue(const float& value){
+void TRM::enterCalibrationValue(const float &value)
+{
     calib_value = value;
     termoCouple.Calibration(calib_value);
+    saveParametrs();
+}
+
+byte TRM::getPredelTemperature() const { return predel_temperature; }
+void TRM::enterPredelTemperature(const byte &predel)
+{
+    predel_temperature = predel;
     saveParametrs();
 }
 
@@ -248,14 +257,20 @@ void TRM::settings()
                         if (upButton->Clicked())
                         {
                             parametrChoice++;
-                            if(parametrChoice == 4){parametrChoice = 1;}
+                            if (parametrChoice == 4)
+                            {
+                                parametrChoice = 1;
+                            }
                             lcd.ClearAll();
                             lcd.TuneBaseSettings(parametrChoice);
                         }
                         if (downButton->Clicked())
                         {
                             parametrChoice--;
-                            if(parametrChoice == 0){parametrChoice = 3;}
+                            if (parametrChoice == 0)
+                            {
+                                parametrChoice = 3;
+                            }
                             lcd.ClearAll();
                             lcd.TuneBaseSettings(parametrChoice);
                         }
@@ -263,7 +278,7 @@ void TRM::settings()
                         {
                             bool yes_no = false;
                             lcd.ClearAll();
-                            if(parametrChoice != 3)
+                            if (parametrChoice != 3)
                                 lcd.TuneBaseSettings(parametrChoice, yes_no);
                             else
                                 lcd.TuneBaseSettings(parametrChoice, calib_value);
@@ -315,18 +330,19 @@ void TRM::settings()
                                     lcd.TuneBaseSettings(parametrChoice);
                                     break;
                                 }
-                                if(upButton->Clicked()){
+                                if (upButton->Clicked())
+                                {
                                     calib_value += 0.10;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
-                                if(downButton->Clicked()){
+                                if (downButton->Clicked())
+                                {
                                     calib_value -= 0.10;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
                             }
-                            
                         }
                     }
                 }
@@ -334,53 +350,62 @@ void TRM::settings()
                 case 2: // параметры по мощности (ok)
                 {
                     printSettings = true;
-                    bool parametr = true;
+                    byte parametr = 1;
                     lcd.ClearAll();
-                    lcd.PowerLimits(parametr, powerMin, powerMax);
+                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
 
                     while (1)
                     {
-                        // Выбор что изменять
                         if (settingsButton.Clicked())
                         {
                             break;
                         }
-                        if (upButton->Clicked() || downButton->Clicked())
+                        if (upButton->Clicked())
                         {
-                            if (parametr)
+                            parametr++;
+                            if (parametr >= 4)
                             {
-                                parametr = false;
-                            }
-                            else
-                            {
-                                parametr = true;
+                                parametr = 1;
                             }
                             lcd.ClearAll();
-                            lcd.PowerLimits(parametr, powerMin, powerMax);
+                            lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
                         }
-                        // Меняем значение
+                        if (downButton->Clicked())
+                        {
+                            parametr--;
+                            if (parametr == 0)
+                            {
+                                parametr = 3;
+                            }
+                            lcd.ClearAll();
+                            lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                        }
                         if (startStopButton.Clicked())
                         {
                             lcd.ClearAll();
-                            if (parametr)
+                            if (parametr == 1)
                             {
                                 lcd.PrintLimitMenu(parametr, powerMin);
                             }
-                            else
+                            else if (parametr == 2)
                             {
                                 lcd.PrintLimitMenu(parametr, powerMax);
                             }
+                            else
+                            {
+                                lcd.PrintLimitMenu(parametr, predel_temperature);
+                            }
 
-                            while (1)
+                            while (1 && parametr != 3)
                             {
                                 if (settingsButton.Clicked() || startStopButton.Clicked())
                                 {
                                     lcd.ClearAll();
-                                    lcd.PowerLimits(parametr, powerMin, powerMax);
+                                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
                                     regulator.setLimits(powerMin, powerMax);
                                     break;
                                 }
-                                if (parametr)
+                                if (parametr == 1)
                                 {
                                     if (upButton->Clicked())
                                     {
@@ -403,7 +428,7 @@ void TRM::settings()
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
                                 }
-                                else if (!parametr)
+                                else if (parametr == 2)
                                 {
                                     if (upButton->Clicked())
                                     {
@@ -427,7 +452,27 @@ void TRM::settings()
                                     }
                                 }
                             }
-                            // надо сохранить все данные в EEprom
+                            while (1 && parametr == 3)
+                            {
+                                if (settingsButton.Clicked() || startStopButton.Clicked())
+                                {
+                                    lcd.ClearAll();
+                                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                                    break;
+                                }
+                                if (upButton->Clicked())
+                                {
+                                    predel_temperature++;
+                                    lcd.ClearAll();
+                                    lcd.PrintLimitMenu(parametr, predel_temperature);
+                                }
+                                if (downButton->Clicked())
+                                {
+                                    predel_temperature--;
+                                    lcd.ClearAll();
+                                    lcd.PrintLimitMenu(parametr, predel_temperature);
+                                }
+                            }
                         }
                     }
                     lcd.ClearAll();
@@ -584,12 +629,12 @@ void TRM::runningProgramm()
         if (timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, " ce\xBA   ");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, timeSet);
         }
         else if (!timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, " \xBC\xB8\xBD   ");
+            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, timeSet);
         }
     }
 }
@@ -615,6 +660,10 @@ byte TRM::getPIDvalue()
 {
     if (runner.is_programm_run())
     {
+        if (getTemperature() >= predel_temperature)
+        {
+            return 0;
+        }
         return regulator.getValuePID(getTemperature());
     }
     else if (regulator.getTuneInfo())
@@ -662,7 +711,7 @@ void TRM::tuningPID()
 
 void TRM::saveParametrs()
 {
-    parametrs param{timeSet, timeDelay, powerMax, powerMin, calib_value};
+    parametrs param{timeSet, timeDelay, powerMax, powerMin, calib_value, predel_temperature};
     regulator.setLimits(powerMin, powerMax);
     runner.putTimeSettings(timeSet, timeDelay);
     EEPROM.put(250, param);
@@ -677,16 +726,18 @@ void TRM::loadParametrs()
     powerMax = param._powerMax;
     powerMin = param._powerMin;
     calib_value = param._calibr;
+    predel_temperature = param._predel;
 }
 void TRM::baseParametrs()
 {
-    parametrs param(false, false, 255, 0, 0.0);
+    parametrs param(false, false, 100, 0, 0.0, 101);
     EEPROM.put(250, param);
     timeSet = param._timeSet;
     timeDelay = param._timeDelay;
     powerMax = param._powerMax;
     powerMin = param._powerMin;
     calib_value = param._calibr;
+    predel_temperature = 101;
     runner.putTimeSettings(timeSet, timeDelay);
     regulator.setLimits(powerMin, powerMax);
     regulator.baseKoefficients();
