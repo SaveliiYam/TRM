@@ -9,6 +9,7 @@ struct Pair {
     
     Pair(M v1, N v2) 
       :val_1(v1), val_2(v2) {}
+
     
     //use default values for copy construction and assignment
     

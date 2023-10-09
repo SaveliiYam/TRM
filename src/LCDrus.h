@@ -54,5 +54,6 @@ public:
     void Tuning(const byte &temperatureMax);
     void TuningProcces(const byte &percent, const byte &temperatureNow);
     void SuccessConection(const bool& status);
+    void Powering(const byte& power, const byte& temp);
 };
 

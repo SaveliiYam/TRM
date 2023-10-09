@@ -31,8 +31,8 @@ public:
     // Надо вызывать перед каждым тюном
     void tuneInitialization(const float &temperatureNeed);
     // тюн
-    Third<bool, byte, byte> tunePID(const float &temperatureNow);
-    Pair<byte, byte> GetPIDValueTune(const float &temperatureNow);
+    Third<bool, byte, byte> tunePID(const int &temperatureNow);
+    Pair<byte, byte> GetPIDValueTune(const int &temperatureNow);
     // вставить коэффициенты в регулятор
     void enterPIDKoefficients(const Koefficients &koefficients);
     //

@@ -6,6 +6,8 @@ TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &
 {
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
+    upButton.ini(upBtn);
+    downButton.ini(dwnBtn);
     termoCouple.ini(sckPin, csPin, soPin);
 }
 
@@ -13,6 +15,7 @@ void TRM::ini()
 {
     lcd.ini();
     loadParametrs();
+    regulator.loadKoefficients();
     regulator.setLimits(powerMin, powerMax);
     runner.putTimeSettings(timeSet, timeDelay);
     termoCouple.Calibration(calib_value);
@@ -48,8 +51,6 @@ byte TRM::getNumberPause() const { return numberPause; }
 void TRM::enterTemperaturePauses()
 {
     temperaturePausesStruct pauseEnter = collector.getPause(numberPause);
-    MyButton *upButton = new MyButton(_upButton);
-    MyButton *downButton = new MyButton(_downButton);
     byte pauseForLCD = numberPause + 1;
     for (byte i = 0; i < 6; i++)
     {
@@ -72,16 +73,15 @@ void TRM::enterTemperaturePauses()
             if (settingsButton.Clicked())
             {
                 collector.writePauses(numberPause, pauseEnter);
-                delete downButton, upButton;
                 return;
             }
-            if (downButton->Clicked())
+            if (downButton.Clicked())
             {
                 temp1--;
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
             }
-            if (upButton->Clicked())
+            if (upButton.Clicked())
             {
                 temp1++;
                 lcd.ClearAll();
@@ -95,10 +95,9 @@ void TRM::enterTemperaturePauses()
             if (settingsButton.Clicked())
             {
                 collector.writePauses(numberPause, pauseEnter);
-                delete downButton, upButton;
                 return;
             }
-            if (downButton->Clicked())
+            if (downButton.Clicked())
             {
                 time1--;
                 if (!timeSet)
@@ -118,7 +117,7 @@ void TRM::enterTemperaturePauses()
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1, timeSet);
             }
-            if (upButton->Clicked())
+            if (upButton.Clicked())
             {
                 time1++;
                 if (!timeSet)
@@ -150,15 +149,12 @@ void TRM::enterTemperaturePauses()
         }
     }
     collector.writePauses(numberPause, pauseEnter);
-    delete downButton, upButton;
 }
 
 void TRM::settings()
 { // настройки 1-паузы, 2-вкл?выкл wifi, 3-параметры по мощности, 4-диапазон времени(сек/мин), 5- отложенное время
     if (settingsButton.Clicked())
     {
-        MyButton *upButton = new MyButton(_upButton);
-        MyButton *downButton = new MyButton(_downButton);
         int whatMenu = 0;
         whatMenu++;
         lcd.ClearAll();
@@ -182,7 +178,7 @@ void TRM::settings()
                 break;
             }
 
-            if (upButton->Clicked())
+            if (upButton.Clicked())
             {
                 whatMenu++;
                 // whatMenu = constrain(whatMenu, 0, 3);
@@ -193,7 +189,7 @@ void TRM::settings()
                 lcd.ClearAll();
                 lcd.settingsMainMenu(whatMenu);
             } // Перемещение кнопками up down
-            if (downButton->Clicked())
+            if (downButton.Clicked())
             {
                 whatMenu--;
                 // whatMenu = constrain(whatMenu, 0, 3);
@@ -254,22 +250,22 @@ void TRM::settings()
                         {
                             break;
                         }
-                        if (upButton->Clicked())
+                        if (upButton.Clicked())
                         {
                             parametrChoice++;
-                            if (parametrChoice == 4)
+                            if (parametrChoice >= 5)
                             {
                                 parametrChoice = 1;
                             }
                             lcd.ClearAll();
                             lcd.TuneBaseSettings(parametrChoice);
                         }
-                        if (downButton->Clicked())
+                        if (downButton.Clicked())
                         {
                             parametrChoice--;
                             if (parametrChoice == 0)
                             {
-                                parametrChoice = 3;
+                                parametrChoice = 4;
                             }
                             lcd.ClearAll();
                             lcd.TuneBaseSettings(parametrChoice);
@@ -278,11 +274,13 @@ void TRM::settings()
                         {
                             bool yes_no = false;
                             lcd.ClearAll();
-                            if (parametrChoice != 3)
+                            if (parametrChoice < 3)
                                 lcd.TuneBaseSettings(parametrChoice, yes_no);
-                            else
+                            else if(parametrChoice == 3)
                                 lcd.TuneBaseSettings(parametrChoice, calib_value);
-                            while (1 && parametrChoice != 3)
+                            else
+                                lcd.TuneBaseSettings(parametrChoice, oper_mode);
+                            while (1 && parametrChoice < 3)
                             {
                                 if (settingsButton.Clicked())
                                 {
@@ -294,13 +292,16 @@ void TRM::settings()
                                 {
                                     if (!yes_no)
                                     {
+                                        lcd.ClearAll();
+                                        lcd.TuneBaseSettings(parametrChoice);
+                                        break;
                                     }
-                                    else if (yes_no && !parametrChoice)
+                                    else if (yes_no && parametrChoice==2)
                                     { // т.н
                                         tuningPID();
                                         break;
                                     }
-                                    else if (yes_no && parametrChoice)
+                                    else if (yes_no && parametrChoice==1)
                                     {
                                         baseParametrs();
                                     }
@@ -308,7 +309,7 @@ void TRM::settings()
                                     lcd.TuneBaseSettings(parametrChoice);
                                     break;
                                 }
-                                if (upButton->Clicked() || downButton->Clicked())
+                                if (upButton.Clicked() || downButton.Clicked())
                                 {
                                     if (yes_no)
                                     {
@@ -330,21 +331,39 @@ void TRM::settings()
                                     lcd.TuneBaseSettings(parametrChoice);
                                     break;
                                 }
-                                if (upButton->Clicked())
+                                if (upButton.Clicked())
                                 {
                                     calib_value += 0.10;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
-                                if (downButton->Clicked())
+                                if (downButton.Clicked())
                                 {
                                     calib_value -= 0.10;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
                             }
+                            while(1 && parametrChoice == 4){
+                                if (settingsButton.Clicked() || startStopButton.Clicked())
+                                {
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice);
+                                    break;
+                                }
+                                if(upButton.Clicked() || downButton.Clicked()){
+                                    if(oper_mode)
+                                        oper_mode = false;
+                                    else
+                                        oper_mode = true;
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice, oper_mode);
+                                }
+                            }
+                            Serial.println(oper_mode);
                         }
                     }
+                    break;
                 }
                 break;
                 case 2: // параметры по мощности (ok)
@@ -360,17 +379,17 @@ void TRM::settings()
                         {
                             break;
                         }
-                        if (upButton->Clicked())
+                        if (upButton.Clicked())
                         {
                             parametr++;
-                            if (parametr >= 4)
+                            if (parametr >= 5)
                             {
                                 parametr = 1;
                             }
                             lcd.ClearAll();
                             lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
                         }
-                        if (downButton->Clicked())
+                        if (downButton.Clicked())
                         {
                             parametr--;
                             if (parametr == 0)
@@ -407,7 +426,7 @@ void TRM::settings()
                                 }
                                 if (parametr == 1)
                                 {
-                                    if (upButton->Clicked())
+                                    if (upButton.Clicked())
                                     {
                                         powerMin++;
                                         if (powerMin > 100)
@@ -417,7 +436,7 @@ void TRM::settings()
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMin);
                                     }
-                                    if (downButton->Clicked())
+                                    if (downButton.Clicked())
                                     {
                                         powerMin--;
                                         if (powerMin == 255)
@@ -430,7 +449,7 @@ void TRM::settings()
                                 }
                                 else if (parametr == 2)
                                 {
-                                    if (upButton->Clicked())
+                                    if (upButton.Clicked())
                                     {
                                         powerMax++;
                                         if (powerMax > 100)
@@ -440,7 +459,7 @@ void TRM::settings()
                                         lcd.ClearAll();
                                         lcd.PrintLimitMenu(parametr, powerMax);
                                     }
-                                    if (downButton->Clicked())
+                                    if (downButton.Clicked())
                                     {
                                         powerMax--;
                                         if (powerMax == 255)
@@ -460,13 +479,13 @@ void TRM::settings()
                                     lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
                                     break;
                                 }
-                                if (upButton->Clicked())
+                                if (upButton.Clicked())
                                 {
                                     predel_temperature++;
                                     lcd.ClearAll();
                                     lcd.PrintLimitMenu(parametr, predel_temperature);
                                 }
-                                if (downButton->Clicked())
+                                if (downButton.Clicked())
                                 {
                                     predel_temperature--;
                                     lcd.ClearAll();
@@ -491,7 +510,7 @@ void TRM::settings()
                         {
                             break;
                         }
-                        if (upButton->Clicked() || downButton->Clicked())
+                        if (upButton.Clicked() || downButton.Clicked())
                         {
                             if (parametrTime)
                             {
@@ -523,7 +542,7 @@ void TRM::settings()
                                     lcd.TimeSettings(parametrTime);
                                     break;
                                 }
-                                if ((upButton->Clicked() || downButton->Clicked()) && parametrTime)
+                                if ((upButton.Clicked() || downButton.Clicked()) && parametrTime)
                                 {
                                     if (timeSet)
                                     {
@@ -536,7 +555,7 @@ void TRM::settings()
                                     lcd.ClearAll();
                                     lcd.TimeConcrete(parametrTime, timeSet);
                                 }
-                                else if ((upButton->Clicked() || downButton->Clicked()) && !parametrTime)
+                                else if ((upButton.Clicked() || downButton.Clicked()) && !parametrTime)
                                 {
                                     if (timeDelay)
                                     {
@@ -563,14 +582,13 @@ void TRM::settings()
         }
         saveParametrs();
         termoCouple.Calibration(calib_value);
-        delete upButton, downButton;
         lcd.ClearAll();
     }
 }
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Clicked())
+    if (startStopButton.Clicked() && !oper_mode)
     {
         if (runner.is_programm_run())
         {
@@ -604,10 +622,29 @@ void TRM::main_programm()
     {
         tunningProgramm();
     }
+    else if(oper_mode){
+        poweringProgramm();
+    }
     else
     {
         printMainMenu(getTemperature());
     }
+}
+
+void TRM::poweringProgramm(){
+    if(upButton.Clicked())
+    {
+        power++;
+        if(power > 100)
+            power = 0;
+    }
+    if(downButton.Clicked())
+    {
+        power--;
+        if(power > 100)
+            power = 100;
+    }
+    lcd.Powering(power, getTemperature());
 }
 
 void TRM::runningProgramm()
@@ -669,6 +706,9 @@ byte TRM::getPIDvalue()
     else if (regulator.getTuneInfo())
     {
         return regulator.GetPIDValueTune(getTemperature()).first();
+    }
+    else if(oper_mode){
+        return map(power, 0, 100, 0, 255);
     }
     else
     {

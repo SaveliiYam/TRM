@@ -158,7 +158,7 @@ void LCD::BaseSettings(const bool &parametr)
     lcd.print(yes);
 }
 
-void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time, const bool& parametrTime)
+void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &parametr, const byte &temperature, const uint16_t &time, const bool &parametrTime)
 {
     NumberProg(numberProgramm);
     lcd.setCursor(0, 1);
@@ -179,10 +179,14 @@ void LCD::EnterTemperaturePause(byte numberProgramm, byte step, const bool &para
     // lcd.print("Set time: ");
     lcd.print("Bpe\xBC\xC7: ");
     lcd.print(time);
-    if(parametrTime){
+    if (parametrTime)
+    {
         lcd.print(" ce\xBa");
     }
-    else{lcd.print(" \xBC\xB8\xBD");}
+    else
+    {
+        lcd.print(" \xBC\xB8\xBD");
+    }
     lcd.print(probel);
 }
 void LCD::Connecting()
@@ -427,6 +431,20 @@ void LCD::TuneBaseSettings(const byte &parametr)
     {
         Point(3);
     }
+    if (parametr == 4)
+    {
+        lcd.setCursor(0, 0);
+        // lcd.print("Other settings");
+        lcd.print("\xE0\x6F\xBE. \xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8");
+        lcd.setCursor(1, 1);
+        // lcd.print("Tune Settings");
+        lcd.print("H\x61\x63\xBF\x70\x6F\xB9\xBA\xB8\x20\xA8\xA5\xE0");
+        lcd.setCursor(1, 2);
+        lcd.print("Ka\xBB\xB8\xB2\x70\x6F\xB3\xBA\x61");
+        lcd.setCursor(1, 3);
+        lcd.print("Pe\xB6\xB8\xBC \x70\x61\xB2\x6F\xBF\xC3");
+        return;
+    }
     lcd.setCursor(0, 0);
     // lcd.print("Other settings");
     lcd.print("\xE0\x6F\xBE. \xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8");
@@ -441,33 +459,64 @@ void LCD::TuneBaseSettings(const byte &parametr)
 }
 void LCD::TuneBaseSettings(const byte &parametr, const bool &choise)
 {
+    if (parametr != 4)
+    {
+        lcd.setCursor(0, 0);
+        if (parametr == 1)
+        {
+            // lcd.print("Base koefficients");
+            lcd.print("Bep\xBD\x79\xBF\xC4");
+            lcd.setCursor(0, 1);
+            lcd.print("\xA0\x61\xB7\x6F\xB3\xC3\x65\x20\xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8?"); // Базовые настройки
+        }
+        else
+        {
+            // lcd.print("Tune Settings");
+            lcd.print("\xA8\x70\x6F\xB8\xB7\xB3\x65\x63\xBF\xB8");
+            lcd.setCursor(0, 1);
+            lcd.print("H\x61\x63\xBF\x70\x6F\xB9\xBA\x79\x20\xA8\xA5\xE0?");
+        }
+        if (choise)
+        {
+            Point(2);
+        }
+        else
+        {
+            Point(3);
+        }
+        lcd.setCursor(1, 2);
+        lcd.print(yes);
+        lcd.setCursor(1, 3);
+        lcd.print(no);
+    }
+    else{
+        lcd.setCursor(0, 0);
+        lcd.print("Pe\xB6\xB8\xBC \x70\x61\xB2\x6F\xBF\xC3");
+        if (choise)
+        {
+            Point(1);
+        }
+        else
+        {
+            Point(2);
+        }
+        lcd.setCursor(1, 1);
+        lcd.print("\xA8\x6F \xBC\x6F\xE6\xBD\x6F\x63\xBF\xB8");
+        lcd.setCursor(1, 2);
+        lcd.print("\xa8\x70\x6F\xB4\x70\x61\xBC\xBC\xBD\x6F");
+    }
+}
+
+void LCD::Powering(const byte& power, const byte& temp){
     lcd.setCursor(0, 0);
-    if (parametr)
-    {
-        // lcd.print("Base koefficients");
-        lcd.print("Bep\xBD\x79\xBF\xC4");
-        lcd.setCursor(0, 1);
-        lcd.print("\xA0\x61\xB7\x6F\xB3\xC3\x65\x20\xBD\x61\x63\xBF\x70\x6F\xB9\xBA\xB8?"); // Базовые настройки
-    }
-    else
-    {
-        // lcd.print("Tune Settings");
-        lcd.print("\xA8\x70\x6F\xB8\xB7\xB3\x65\x63\xBF\xB8");
-        lcd.setCursor(0, 1);
-        lcd.print("H\x61\x63\xBF\x70\x6F\xB9\xBA\x79\x20\xA8\xA5\xE0?");
-    }
-    if (choise)
-    {
-        Point(2);
-    }
-    else
-    {
-        Point(3);
-    }
-    lcd.setCursor(1, 2);
-    lcd.print(yes);
-    lcd.setCursor(1, 3);
-    lcd.print(no);
+    lcd.print("Mo\xE6\xBD\x6F\x63\xBF\xC4: ");
+    lcd.print(power);
+    lcd.print("%");
+    lcd.print(probel);
+    lcd.setCursor(0, 1);
+    lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61: ");
+    lcd.print(temp);
+    lcd.print(probel);
 }
 
 void LCD::TuneBaseSettings(const byte &parametr, const float &calib)

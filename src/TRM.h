@@ -34,11 +34,14 @@ private:
 
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
-    MyButton settingsButton, startStopButton, motorButton;
+    MyButton settingsButton, startStopButton, motorButton, upButton, downButton;
     MyThermoCouple termoCouple;
 
     bool timeSet = false;   // переменная связанная со временем, она должна загружаться из EEprom (false == min)
     bool timeDelay = false; // переменная связанная с отложенным временем
+    
+    bool oper_mode = false; //режим работы
+    byte power = 0; //мощность
 
     float calib_value = 0;
 
@@ -51,6 +54,7 @@ private:
     void motorOn();
     void startProgramm();
     void runningProgramm();
+    void poweringProgramm();
     void tunningProgramm();
     void printMainMenu(const int &temperatureNew);
     void WiFiConnect(); // Подключение к wifi
