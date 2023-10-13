@@ -42,6 +42,7 @@
 
 
 ## Описание классов и структур
+Для всех классов и структур кроме ```TRM``` и ```LCD``` приведен список используемых методов и полей.
 ### struct temperaturePausesStruct
 ```cpp
     struct temperaturePausesStruct{                             
@@ -51,7 +52,40 @@
 ```
 Данная структура отвечает за одну температурную программу. В ходе выполнения программы данная структура может записываться в память или читаться из нее. К видно, температурная программа состоит из двух массивов по 6 элементов в каждой. setpoint определяет температуру уставки, а time определяет время поддержания температуры уставки.
 
+### struct parametrs
+```cpp
+struct parametrs
+{
+    parametrs(const bool &timeSet, const bool &timeDelay, const byte &powerMax, const byte &powerMin, const float &calibr, const byte &predel)
+        : _timeSet(timeSet), _timeDelay(timeDelay), _powerMax(powerMax), _powerMin(powerMin), _calibr(calibr), _predel(predel) {}
+    parametrs() {}
+    bool _timeSet;
+    bool _timeDelay;
+    byte _powerMax = 255, _powerMin = 0, _predel = 101;
+    float _calibr = 0;
+};
+```
+Данная структура используется для получения и записи настроек времени, мощности и калибровочных значений.
+
+###struct Koefficients 
+```cpp
+struct Koefficients
+{
+    float P = 1;
+    float I = 1;
+    float D = 1;
+};
+
+```
+Структура хранящая ПИД коэффициенты.
+
+Структуры ```parametrs``` и ```Koefficients``` при создании иницализируются стандартными значениями для возможного сброса настроек.
+
 ### class TRM
+* Основной класс всей программы, использует интерфейсы ниже приведенных классов для вывода и приема информации. Отвечает за правильное сохранение всех настроек и температурных программ. 
+* Предоставляет метод ввода настроек с помощью кнопок или веб-интерфейса.
+* Отвечает на команды пользователя по вводу температурной программы, посылает команды для всех используемых классов.
+* В основном ```loop``` цикле ожидает ввода каких-либо команд и возвращает выходное значение для нагреваетля.
 ### class LCD
 * Отвечает за вывод всей информации на экран.
 * Использует библиотеку LiquidCrystal_I2C. 
@@ -91,3 +125,71 @@ public:
 ```
 Данный класс служит для записи и получения температурных программ. Хранит порядковые номера программ последовательно. Каждой программе соответствует определенная ячейка памяти. Получение программы происходит по передаче порядкового номера программы. Запись происходит по передаче порядкового номера программы и самой программе. Для записи и получения использует класс TemperatureProgramm. 
 
+### class ProgrammRunner
+```cpp
+class ProgrammRunner
+{
+private:
+    temperaturePausesStruct programm_;
+    bool timeSet = false;
+    bool timeDelay = false;
+    bool startTime = false;
+    bool can_to_start = false;
+    bool is_stopped = false;
+    uint32_t timer = millis();
+    uint32_t ticker = 0;
+    byte numberPause = 0;
+
+public:
+    ProgrammRunner(const temperaturePausesStruct &programm, const bool &time, const bool &delay);
+    ProgrammRunner(const bool &time, const bool &delay);
+    ProgrammRunner();
+    void putTimeSet(const bool &time);
+    void putTimeDelay(const bool &delay);
+    void putTimeSettings(const bool &time, const bool &delay); //Ввод настроек всех времени одним методом
+    void putProgramm(const temperaturePausesStruct &programm); // Ввод температуры нагрева
+    bool is_programm_run() const; // если программа закончена, то false
+    void programm_stop(); // Выполняет остановку программы
+    void startPause(); // Выполняет запуск программы нагрева 
+    Third<byte, uint32_t, byte> runningProgramm(const float &temperature); //Метод, который активно ведет отсчет времени температурной программы и возвращает порядковый номер программы, оставшееся время выполняемой паузы и температуру уставки программы. 
+    //Для реализации правильной работы задержки нагрева необходимо передавать температуру 
+};
+```
+Данный класс служит для начала старта или остановки выполнения программы нагрева. Использует настройки времени (при активированной настройки задержки времени не начинает остчет времени пока не будет достигнута температура уставки). Инициализацию класса можно производить без параметров или передав ей параметры времени и температурную программу, которая будет выполняться.
+
+### class PIDRegulator
+```cpp
+class PIDRegulator
+{
+private:
+    Koefficients koefficients;
+    GyverPID regulator;
+    PIDtuner tuner;
+    bool tune = false;
+    Pair<byte, byte> parametrsForLCD{0, 0};
+
+public:
+    PIDRegulator();
+
+    // Надо каждый раз вводить лимиты
+    void setLimits(const byte &minValue, const byte &maxValue); // Ограничение выходной мощности в процентах
+    // Получить значение
+    int getValuePID(const int &temperatureNow);
+    // Внести температуру уставки
+    void putTemperature(const int &setTemperature);
+    // Надо вызывать перед каждым тюном
+    void tuneInitialization(const float &temperatureNeed);
+    // тюн
+    Third<bool, byte, byte> tunePID(const int &temperatureNow);
+    Pair<byte, byte> GetPIDValueTune(const int &temperatureNow);
+    // вставить коэффициенты в регулятор
+    void enterPIDKoefficients(const Koefficients &koefficients);
+    //
+    void loadKoefficients();
+    void saveKoefficients();
+    void baseKoefficients();
+    bool getTuneInfo() const;
+    Pair<byte, byte> GetParametrsLCD() const;// Получение значений для передачи их на дисплей
+};
+```
+Данный класс использует ПИД регулятор, хранит в себе ПИД коэффициенты. Позоволяет производить корректировку коэффициентов и регулировку максимальной и минимальной вызодной мощности в процентах. Для расчетов и корректировки использует библиотеку ПИд регулятора.

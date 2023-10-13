@@ -22,17 +22,17 @@ public:
         TemperatureProgramm *pauseClass = new TemperatureProgramm(_adress[numberProgramm]); // Создали паузу по адрессу
         pauseClass->writePauses(_adress[numberProgramm], pause);
 
-        Serial.println("I write");
-        Serial.print("Number pause: ");
-        Serial.println(numberProgramm);
-        for (int i = 0; i != 5; i++)
-        {
-            Serial.print("Temp: ");
-            Serial.println(pause.setpointTemperature[i]);
-            Serial.print("Time: ");
-            Serial.println(pause.time[i]);
-        }
-        Serial.println("...");
+        // Serial.println("I write");
+        // Serial.print("Number pause: ");
+        // Serial.println(numberProgramm);
+        // for (int i = 0; i != 5; i++)
+        // {
+        //     Serial.print("Temp: ");
+        //     Serial.println(pause.setpointTemperature[i]);
+        //     Serial.print("Time: ");
+        //     Serial.println(pause.time[i]);
+        // }
+        // Serial.println("...");
 
         delete pauseClass;
     }
