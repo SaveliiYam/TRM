@@ -4,4 +4,4 @@
 .vscode/launch.json
 .vscode/ipch
 
-src/arduino_serets/
+src/arduino_serets/arduino_serets.h
