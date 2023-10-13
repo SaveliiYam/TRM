@@ -86,4 +86,6 @@ public:
     Fouth<bool, bool, byte, byte> getParametrs() const { return Fouth<bool, bool, byte, byte>(timeSet, timeDelay, powerMax, powerMin); }
     void save_parametrs_time(const byte &what, const bool &value);
     void save_parametrs_power(const byte &what, const byte &value);
+    bool getMode() const{return oper_mode;}
+    void enterMode(const bool& mode);
 };

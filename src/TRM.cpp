@@ -33,16 +33,21 @@ float TRM::getCalibrationValue() const
 
 void TRM::enterCalibrationValue(const float &value)
 {
-    calib_value = value;
-    termoCouple.Calibration(calib_value);
-    saveParametrs();
+    if (calib_value != value)
+    {
+        calib_value = value;
+        termoCouple.Calibration(calib_value);
+        saveParametrs();
+    }
 }
 
 byte TRM::getPredelTemperature() const { return predel_temperature; }
 void TRM::enterPredelTemperature(const byte &predel)
 {
-    predel_temperature = predel;
-    saveParametrs();
+    if(predel_temperature != predel){
+        predel_temperature = predel;
+        saveParametrs();    
+    }
 }
 
 byte TRM::getNumberPause() const { return numberPause; }
@@ -276,7 +281,7 @@ void TRM::settings()
                             lcd.ClearAll();
                             if (parametrChoice < 3)
                                 lcd.TuneBaseSettings(parametrChoice, yes_no);
-                            else if(parametrChoice == 3)
+                            else if (parametrChoice == 3)
                                 lcd.TuneBaseSettings(parametrChoice, calib_value);
                             else
                                 lcd.TuneBaseSettings(parametrChoice, oper_mode);
@@ -296,12 +301,12 @@ void TRM::settings()
                                         lcd.TuneBaseSettings(parametrChoice);
                                         break;
                                     }
-                                    else if (yes_no && parametrChoice==2)
+                                    else if (yes_no && parametrChoice == 2)
                                     { // т.н
                                         tuningPID();
                                         break;
                                     }
-                                    else if (yes_no && parametrChoice==1)
+                                    else if (yes_no && parametrChoice == 1)
                                     {
                                         baseParametrs();
                                     }
@@ -333,26 +338,28 @@ void TRM::settings()
                                 }
                                 if (upButton.Clicked())
                                 {
-                                    calib_value += 0.10;
+                                    calib_value += 0.25;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
                                 if (downButton.Clicked())
                                 {
-                                    calib_value -= 0.10;
+                                    calib_value -= 0.25;
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice, calib_value);
                                 }
                             }
-                            while(1 && parametrChoice == 4){
+                            while (1 && parametrChoice == 4)
+                            {
                                 if (settingsButton.Clicked() || startStopButton.Clicked())
                                 {
                                     lcd.ClearAll();
                                     lcd.TuneBaseSettings(parametrChoice);
                                     break;
                                 }
-                                if(upButton.Clicked() || downButton.Clicked()){
-                                    if(oper_mode)
+                                if (upButton.Clicked() || downButton.Clicked())
+                                {
+                                    if (oper_mode)
                                         oper_mode = false;
                                     else
                                         oper_mode = true;
@@ -622,7 +629,8 @@ void TRM::main_programm()
     {
         tunningProgramm();
     }
-    else if(oper_mode){
+    else if (oper_mode)
+    {
         poweringProgramm();
     }
     else
@@ -631,17 +639,18 @@ void TRM::main_programm()
     }
 }
 
-void TRM::poweringProgramm(){
-    if(upButton.Clicked())
+void TRM::poweringProgramm()
+{
+    if (upButton.Clicked())
     {
         power++;
-        if(power > 100)
+        if (power > 100)
             power = 0;
     }
-    if(downButton.Clicked())
+    if (downButton.Clicked())
     {
         power--;
-        if(power > 100)
+        if (power > 100)
             power = 100;
     }
     lcd.Powering(power, getTemperature());
@@ -707,7 +716,12 @@ byte TRM::getPIDvalue()
     {
         return regulator.GetPIDValueTune(getTemperature()).first();
     }
-    else if(oper_mode){
+    else if (oper_mode)
+    {
+        if (getTemperature() >= predel_temperature)
+        {
+            return 0;
+        }
         return map(power, 0, 100, 0, 255);
     }
     else
@@ -819,6 +833,7 @@ void TRM::put_number_prog(const byte &number)
 {
     numberPause = number;
     numberPause--;
+    printMainMenu(10);
 }
 
 void TRM::save_parametrs_time(const byte &what, const bool &value)
@@ -827,16 +842,23 @@ void TRM::save_parametrs_time(const byte &what, const bool &value)
     {
     case 1:
     {
-        timeSet = value;
+        if (timeSet != value)
+        {
+            timeSet = value;
+            saveParametrs();
+        }
         break;
     }
     case 2:
     {
-        timeDelay = value;
+        if (timeDelay != value)
+        {
+            timeDelay = value;
+            saveParametrs();
+        }
         break;
     }
     }
-    saveParametrs();
 }
 void TRM::save_parametrs_power(const byte &what, const byte &value)
 {
@@ -844,14 +866,32 @@ void TRM::save_parametrs_power(const byte &what, const byte &value)
     {
     case 3:
     {
-        powerMax = value;
+        if (powerMax != value)
+        {
+            powerMax = value;
+            saveParametrs();
+        }
         break;
     }
     case 4:
     {
-        powerMin = value;
+        if (powerMin != value)
+        {
+            powerMin = value;
+            saveParametrs();
+        }
         break;
     }
     }
-    saveParametrs();
+}
+
+void TRM::enterMode(const bool &mode)
+{
+    if(oper_mode != mode){
+        oper_mode = mode;
+    }
+    if (!mode)
+    {
+        printMainMenu(10);
+    }
 }

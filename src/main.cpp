@@ -15,7 +15,6 @@ byte number_prog = 1, number_prog_old = 0;
 int a = 0, b;
 bool high_low = false;
 bool start_programm = false, stop_programm = false;
-bool tune_programm = false;
 bool wifiOn = false;
 
 uint32_t timer = millis();
@@ -38,6 +37,7 @@ TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButto
 void connectWiFi();
 void dimmer(const byte &pidValue);
 bool wifiManager();
+void wifiManager2();
 
 void setup()
 {
@@ -45,6 +45,7 @@ void setup()
     EEPROM.begin(600);
 
     connectWiFi();
+    //wifiManager2();
 
     pinMode(output_pin, OUTPUT);
     digitalWrite(output_pin, LOW);
@@ -71,14 +72,6 @@ void setup()
         }
         stop_programm = in ? true : false;
     };
-    thing["Tune_settings"] << [](pson &in)
-    {
-        if (in.is_empty())
-        {
-            in = tune_programm;
-        }
-        tune_programm = in ? true : false;
-    };
     thing["Number_programm"] << [](pson &in)
     {
         if (in.is_empty())
@@ -99,9 +92,9 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = trm.getParametrs().second();
+            in = !trm.getParametrs().second();
         }
-        trm.save_parametrs_time(2, in);
+        trm.save_parametrs_time(2, !in);
     };
     thing["Power_max"] << [](pson &in)
     {
@@ -134,6 +127,12 @@ void setup()
             in = trm.getPredelTemperature();
         }
         trm.enterPredelTemperature(in);
+    };
+    thing["mode_work"] << [](pson &in){
+        if(in.is_empty()){
+            in = trm.getMode();
+        }
+        trm.enterMode(in);
     };
 }
 
@@ -225,8 +224,17 @@ bool wifiManager()
 {
     WiFi.mode(WIFI_STA);
     WiFiManager wifiManager;
-    // wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
+    //wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
     bool res;                             // храним переменную для подключения
     res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
     return res;
+}
+
+void wifiManager2()
+{
+    WiFi.mode(WIFI_STA);
+    WiFiManager wifiManager;
+    //wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
+    bool res;                             // храним переменную для подключения
+    res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
 }
