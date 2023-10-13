@@ -4,7 +4,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <ThingerESP32.h>
 #include <EEPROM.h>
-#include "arduino_secrets.h"
+#include "arduino_secrets/arduino_secrets.h"
 #include "buttons/MyButton.h"
 #include "Fouth.h"
 #define TINGER_SERIAL_DEBUG
