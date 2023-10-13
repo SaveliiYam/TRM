@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
-#include "MyButton.h"
-#include "MyThermoCouple.h"
+#include "buttons/MyButton.h"
+#include "thermocouple/MyThermoCouple.h"
 #include "TemperatureProgramm.h"
 #include "TemperaturePausesCollector.h"
 #include "Pair.h"

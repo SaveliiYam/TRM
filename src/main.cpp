@@ -5,7 +5,7 @@
 #include <ThingerESP32.h>
 #include <EEPROM.h>
 #include "arduino_secrets.h"
-#include "MyButton.h"
+#include "buttons/MyButton.h"
 #include "Fouth.h"
 #define TINGER_SERIAL_DEBUG
 
