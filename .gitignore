@@ -5,4 +5,4 @@
 .vscode/ipch
 
 src/arduino_secrets/arduino_secrets.h
-src/arduino_secrets/arduino_secrets.h
+./src/arduino_secrets/*

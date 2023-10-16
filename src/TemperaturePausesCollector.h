@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include "TemperatureProgramm.h"
-#include "Pair.h"
+#include "couples/Pair.h"
 #include "Structures.h"
 /*
 Каждый раз при использовании пауз, генерируется коллектор,

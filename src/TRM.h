@@ -4,15 +4,15 @@
 #include "thermocouple/MyThermoCouple.h"
 #include "TemperatureProgramm.h"
 #include "TemperaturePausesCollector.h"
-#include "Pair.h"
+#include "couples/Pair.h"
 
 #include <EEPROM.h>
 #include <WiFi.h>
 #include "PIDRegulator.h"
 #include "Structures.h"
 #include "ProgrammRunner.h"
-#include "Third.h"
-#include "Fouth.h"
+#include "couples/Third.h"
+#include "couples/Fouth.h"
 
 #include "LCDrus.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "Pair.h"
+#include "couples/Pair.h"
 #include <EEPROM.h>
 #include "Structures.h"
 

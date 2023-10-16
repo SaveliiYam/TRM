@@ -6,7 +6,7 @@
 #include <EEPROM.h>
 #include "arduino_secrets/arduino_secrets.h"
 #include "buttons/MyButton.h"
-#include "Fouth.h"
+#include "couples/Fouth.h"
 #define TINGER_SERIAL_DEBUG
 
 ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
@@ -37,7 +37,6 @@ TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButto
 void connectWiFi();
 void dimmer(const byte &pidValue);
 bool wifiManager();
-void wifiManager2();
 
 void setup()
 {
@@ -45,7 +44,6 @@ void setup()
     EEPROM.begin(600);
 
     connectWiFi();
-    //wifiManager2();
 
     pinMode(output_pin, OUTPUT);
     digitalWrite(output_pin, LOW);
@@ -228,13 +226,4 @@ bool wifiManager()
     bool res;                             // храним переменную для подключения
     res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
     return res;
-}
-
-void wifiManager2()
-{
-    WiFi.mode(WIFI_STA);
-    WiFiManager wifiManager;
-    //wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
-    bool res;                             // храним переменную для подключения
-    res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
 }

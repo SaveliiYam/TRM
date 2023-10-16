@@ -1,8 +1,8 @@
 #pragma once
 #include <Arduino.h>
 #include "Structures.h"
-#include "Pair.h"
-#include "Third.h"
+#include "couples/Pair.h"
+#include "couples/Third.h"
 // #include "TemperaturePausesCollector.h"
 
 class ProgrammRunner

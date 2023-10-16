@@ -4,8 +4,8 @@
 #include <PIDtuner.h>
 #include <EEPROM.h>
 #include "Structures.h"
-#include "Pair.h"
-#include "Third.h"
+#include "couples/Pair.h"
+#include "couples/Third.h"
 
 class PIDRegulator
 {

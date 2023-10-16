@@ -1,5 +1,5 @@
 #include "PIDRegulator.h"
-#include "Pair.h"
+#include "couples/Pair.h"
 
 PIDRegulator::PIDRegulator()
 { // Нужно из EEprom грузить коэффициенты и писать их в регулятор

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include "Pair.h"
+#include "couples/Pair.h"
 // #include "Simbols.h"
 class LCD
 {
