@@ -35,7 +35,7 @@ void TRM::enterCalibrationValue(const float &value)
 {
     if (calib_value != value)
     {
-        calib_value = value;
+        calib_value = constrain(value, -100.0, 100.0);
         termoCouple.Calibration(calib_value);
         saveParametrs();
     }
@@ -636,6 +636,9 @@ void TRM::main_programm()
     else
     {
         printMainMenu(getTemperature());
+        set_temp_for_th = 0;
+        set_time_for_th = 0;
+        number_pause_for_th = 0;
     }
 }
 
@@ -660,12 +663,12 @@ void TRM::runningProgramm()
 {
     Third<byte, uint32_t, byte> pause = runner.runningProgramm(termoCouple.ReadCelsius());
     byte pause1 = pause.first() + 1;
+    number_pause_for_th = pause1;
     uint32_t time_lcd = pause.second();
-    static byte setpointTemp;
-    if (setpointTemp != pause.third())
+    if (set_temp_for_th != pause.third())
     {
-        setpointTemp = pause.third();
-        regulator.putTemperature(setpointTemp);
+        set_temp_for_th = pause.third();
+        regulator.putTemperature(set_temp_for_th);
     }
     static uint32_t miniTimer;
     if (millis() - miniTimer >= 1000)
@@ -675,12 +678,14 @@ void TRM::runningProgramm()
         if (timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 1000, timeSet);
+            set_time_for_th = time_lcd / 1000;
+            lcd.workProgramm(set_temp_for_th, termoCouple.ReadCelsius(), pause1, set_time_for_th, timeSet);
         }
         else if (!timeSet)
         {
             // lcd.workProgramm(termoCouple.ReadCelsius(), pause.first(), time_lcd);
-            lcd.workProgramm(setpointTemp, termoCouple.ReadCelsius(), pause1, time_lcd / 60000 + 1, timeSet);
+            set_time_for_th = time_lcd / 60000;
+            lcd.workProgramm(set_temp_for_th, termoCouple.ReadCelsius(), pause1, set_time_for_th + 1, timeSet);
         }
     }
 }
@@ -868,7 +873,7 @@ void TRM::save_parametrs_power(const byte &what, const byte &value)
     {
         if (powerMax != value)
         {
-            powerMax = value;
+            powerMax = constrain(value, 0, 100);
             saveParametrs();
         }
         break;
@@ -877,7 +882,7 @@ void TRM::save_parametrs_power(const byte &what, const byte &value)
     {
         if (powerMin != value)
         {
-            powerMin = value;
+            powerMin = constrain(value, 0, 100);
             saveParametrs();
         }
         break;
@@ -894,4 +899,8 @@ void TRM::enterMode(const bool &mode)
     {
         printMainMenu(10);
     }
+}
+
+void TRM::enterPowerValueNow(const byte& value){
+    power = constrain(value, 0, 100);
 }

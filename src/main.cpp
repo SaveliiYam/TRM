@@ -7,6 +7,8 @@
 #include "arduino_secrets/arduino_secrets.h"
 #include "buttons/MyButton.h"
 #include "couples/Fouth.h"
+#include "couples/Pair.h"
+#include "couples/Third.h"
 #define TINGER_SERIAL_DEBUG
 
 ThingerESP32 thing(USERNAME, DEVICE_ID, DEVICE_CREDENTIAL);
@@ -126,11 +128,27 @@ void setup()
         }
         trm.enterPredelTemperature(in);
     };
-    thing["mode_work"] << [](pson &in){
-        if(in.is_empty()){
+    thing["mode_work"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
             in = trm.getMode();
         }
         trm.enterMode(in);
+    };
+    thing["Power_value"] << [](pson &in)
+    {
+        if (in.is_empty())
+        {
+            trm.getPowerValueNow();
+        }
+        trm.enterPowerValueNow(in);
+    };
+    thing["OutputTimeTemperature"] >> [](pson & out){
+        Third<byte, uint32_t, byte> out_val = trm.getOutputTimeTem();
+        out["timeOutput"] = out_val.second();
+        out["tempOutput"] = out_val.first();
+        out["numberPauseOutput"] = out_val.third();
     };
 }
 
@@ -222,7 +240,7 @@ bool wifiManager()
 {
     WiFi.mode(WIFI_STA);
     WiFiManager wifiManager;
-    //wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
+    // wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
     bool res;                             // храним переменную для подключения
     res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
     return res;

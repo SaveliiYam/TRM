@@ -42,6 +42,9 @@ private:
     
     bool oper_mode = false; //режим работы
     byte power = 0; //мощность
+    byte set_temp_for_th = 0;//Температура уставки 
+    byte number_pause_for_th = 0;
+    uint32_t set_time_for_th = 0;
 
     float calib_value = 0;
 
@@ -51,7 +54,6 @@ private:
     byte getNumberPause() const;
     void enterTemperaturePauses();
     void settings();
-    void motorOn();
     void startProgramm();
     void runningProgramm();
     void poweringProgramm();
@@ -88,4 +90,7 @@ public:
     void save_parametrs_power(const byte &what, const byte &value);
     bool getMode() const{return oper_mode;}
     void enterMode(const bool& mode);
+    byte getPowerValueNow()const {return power;}
+    void enterPowerValueNow(const byte& value);
+    Third<byte, uint32_t, byte> getOutputTimeTem() const{return Third<byte, uint32_t, byte>{set_temp_for_th, set_time_for_th, number_pause_for_th};}
 };

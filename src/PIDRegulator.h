@@ -15,7 +15,6 @@ private:
     PIDtuner tuner;
     bool tune = false;
     Pair<byte, byte> parametrsForLCD{0, 0};
-
 public:
     PIDRegulator();
 

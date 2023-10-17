@@ -59,6 +59,10 @@ void LCD::ConnectToWifi(const bool &connect)
 
 void LCD::workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const bool &timeParametr)
 {
+    uint32_t timeNew = time;
+    if(timeNew != 0){
+        timeNew--;
+    }
     lcd.setCursor(0, 0);
     lcd.print("\xA9\x63\xBF\x61\xB3\xBA\x61"
               ": "); // setpoint
@@ -73,18 +77,19 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
     lcd.setCursor(0, 2);
     lcd.print("Bpe\xBC\xC7"
               ": "); // time
-    lcd.print(time);
+    lcd.print(timeNew);
     if (timeParametr)
     {
-        lcd.print(" ce\xBA     ");
+        lcd.print(" ce\xBA");
+        lcd.print(probel);
     }
     else
     {
-        lcd.print(" \xBC\xB8\xBD    ");
+        lcd.print(" \xBC\xB8\xBD");
+        lcd.print(probel);
     }
     lcd.setCursor(0, 3);
-    lcd.print("\xA8\x61\x79\xB7\x61"
-              ": "); // pause
+    lcd.print("\xA8\x61\x79\xB7\x61: "); // pause
     lcd.print(numberPause);
     lcd.print(probel);
 }
