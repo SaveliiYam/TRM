@@ -30,7 +30,7 @@ class TRM
 private:
     byte _upButton, _downButton, _motorPin, numberPause = 0;
     byte powerMax = 0, powerMin = 0; // переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
-    byte predel_temperature = 101;
+    byte predel_temperature;
 
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
@@ -86,7 +86,7 @@ public:
     void start_program_from_server(const bool &start);
     void stop_program_from_server(const bool &stop);
     void put_number_prog(const byte &number);
-    const Fouth<bool, bool, int, int> getParametrs() const { return Fouth<bool, bool, int, int>(timeSet, timeDelay, powerMax, powerMin); }
+    //const Fouth<bool, bool, int, int> getParametrs() const { return Fouth<bool, bool, int, int>(timeSet, timeDelay, powerMax, powerMin); }
     const bool getTimeSet() const {return timeSet;}
     const bool getTimeDelay() const {return timeDelay;}
     const int getPowerMax() const {return powerMax;}

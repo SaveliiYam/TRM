@@ -46,11 +46,12 @@ void TRM::enterCalibrationValue(const int &value)
 byte TRM::getPredelTemperature() const { return predel_temperature; }
 void TRM::enterPredelTemperature(const byte &predel)
 {
-    if (predel_temperature != predel)
+    if (predel_temperature == predel)
     {
-        predel_temperature = predel;
-        saveParametrs();
+        return;
     }
+    predel_temperature = predel;
+    saveParametrs();
 }
 
 byte TRM::getNumberPause() const { return numberPause; }
@@ -163,7 +164,7 @@ void TRM::enterTemperaturePauses()
 
 void TRM::checkNumberProgButton()
 {
-    if (!numberButton.Clicked())
+    if (!numberButton.Clicked() || runner.is_programm_run())
     {
         return;
     }
@@ -614,7 +615,10 @@ void TRM::settings()
 
 void TRM::startProgramm()
 {
-    if(oper_mode){return;}
+    if (oper_mode)
+    {
+        return;
+    }
     if (startStopButton.Clicked())
     {
         if (runner.is_programm_run())
@@ -835,7 +839,10 @@ void TRM::baseParametrs()
 
 void TRM::start_program_from_server(const bool &start)
 {
-    if(oper_mode){return;}
+    if (oper_mode)
+    {
+        return;
+    }
     if (start && !runner.is_programm_run())
     {
         lcd.ClearAll();
@@ -847,7 +854,10 @@ void TRM::start_program_from_server(const bool &start)
 }
 void TRM::stop_program_from_server(const bool &stop)
 {
-    if(oper_mode){return;}
+    if (oper_mode)
+    {
+        return;
+    }
     if (stop && runner.is_programm_run())
     {
         lcd.ClearAll();

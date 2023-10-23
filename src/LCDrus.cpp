@@ -64,19 +64,16 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
         timeNew--;
     }
     lcd.setCursor(0, 0);
-    lcd.print("\xA9\x63\xBF\x61\xB3\xBA\x61"
-              ": "); // setpoint
+    lcd.print("\xA9\x63\xBF\x61\xB3\xBA\x61: "); // setpoint
     lcd.print(setpointTemperature);
     lcd.print(probel);
     lcd.print(probel);
     lcd.setCursor(0, 1);
-    lcd.print("\x54\x65\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61"
-              ": "); // Temperature
+    lcd.print("\x54\x65\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61: "); // Temperature
     lcd.print(temperature);
     lcd.print(probel);
     lcd.setCursor(0, 2);
-    lcd.print("Bpe\xBC\xC7"
-              ": "); // time
+    lcd.print("Bpe\xBC\xC7: "); // time
     lcd.print(timeNew);
     if (timeParametr)
     {
@@ -97,13 +94,11 @@ void LCD::workProgramm(const int &setpointTemperature, const float &temperature,
 void LCD::mainMenu(const int &temperature, const byte &number)
 {
     lcd.setCursor(0, 0);
-    lcd.print("Ho\xBC\x65\x70 \xBE\x70\x6F\xB4"
-              ": "); // number prog
+    lcd.print("Ho\xBC\x65\x70 \xBE\x70\x6F\xB4: "); // number prog
     lcd.print(number);
     lcd.print(probel);
     lcd.setCursor(0, 1);
-    lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61"
-              ": "); // temperature
+    lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61: "); // temperature
     lcd.print(temperature);
     lcd.print(probel);
 }
@@ -115,8 +110,7 @@ void LCD::mainMenu(const int &temperature, const byte &number, const byte max, c
     lcd.print(number);
     lcd.print(probel);
     lcd.setCursor(0, 1);
-    lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61"
-              ": "); // temperature
+    lcd.print("Te\xBC\xBE\x65\x70\x61\xBF\x79\x70\x61: "); // temperature
     lcd.print(temperature);
     lcd.print(probel);
     Clear(2);
