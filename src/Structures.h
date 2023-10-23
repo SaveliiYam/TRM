@@ -24,7 +24,7 @@ struct temperaturePausesStruct
 
 struct parametrs
 {
-    parametrs(const bool &timeSet, const bool &timeDelay, const byte &powerMax, const byte &powerMin, const float &calibr, const byte &predel)
+    parametrs(const bool &timeSet, const bool &timeDelay, const byte &powerMax, const byte &powerMin, const int &calibr, const byte &predel)
         : _timeSet(timeSet), _timeDelay(timeDelay), _powerMax(powerMax), _powerMin(powerMin), _calibr(calibr), _predel(predel) {}
     parametrs() {}
     bool _timeSet;

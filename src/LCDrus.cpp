@@ -524,7 +524,7 @@ void LCD::Powering(const byte& power, const byte& temp){
     lcd.print(probel);
 }
 
-void LCD::TuneBaseSettings(const byte &parametr, const float &calib)
+void LCD::TuneBaseSettings(const byte &parametr, const int &calib)
 {
     lcd.setCursor(0, 0);
     lcd.print("Ka\xBB\xB8\xB2\x70\x6F\xB3\xBA\x61");

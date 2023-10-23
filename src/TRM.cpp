@@ -2,12 +2,13 @@
 
 TRM::TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
          const byte &nmbBtn, const byte &mtrBtn, const byte &mtrPin, const byte &sckPin, const byte &csPin, const byte &soPin)
-    : _upButton(upBtn), _downButton(dwnBtn), _numberButton(nmbBtn), _motorPin(mtrPin)
+    : _upButton(upBtn), _downButton(dwnBtn), _motorPin(mtrPin)
 {
     settingsButton.ini(setBtn);
     startStopButton.ini(strtBtn);
     upButton.ini(upBtn);
     downButton.ini(dwnBtn);
+    numberButton.ini(nmbBtn);
     termoCouple.ini(sckPin, csPin, soPin);
 }
 
@@ -26,27 +27,29 @@ float TRM::getTemperature()
     return termoCouple.ReadCelsius();
 }
 
-float TRM::getCalibrationValue() const
+int TRM::getCalibrationValue() const
 {
     return termoCouple.GetCalibValue();
 }
 
-void TRM::enterCalibrationValue(const float &value)
+void TRM::enterCalibrationValue(const int &value)
 {
-    if (calib_value != value)
+    if (calib_value == value)
     {
-        calib_value = constrain(value, -100.0, 100.0);
-        termoCouple.Calibration(calib_value);
-        saveParametrs();
+        return;
     }
+    calib_value = constrain(value, -100, 100);
+    termoCouple.Calibration(calib_value);
+    saveParametrs();
 }
 
 byte TRM::getPredelTemperature() const { return predel_temperature; }
 void TRM::enterPredelTemperature(const byte &predel)
 {
-    if(predel_temperature != predel){
+    if (predel_temperature != predel)
+    {
         predel_temperature = predel;
-        saveParametrs();    
+        saveParametrs();
     }
 }
 
@@ -80,15 +83,17 @@ void TRM::enterTemperaturePauses()
                 collector.writePauses(numberPause, pauseEnter);
                 return;
             }
-            if (downButton.Clicked())
+            if (upButton.Clicked())
             {
                 temp1--;
+                temp1 = constrain(temp1, 0, predel_temperature);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
             }
-            if (upButton.Clicked())
+            if (downButton.Clicked())
             {
                 temp1++;
+                temp1 = constrain(temp1, 0, predel_temperature);
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, false, temp1, time1, timeSet);
             }
@@ -102,7 +107,7 @@ void TRM::enterTemperaturePauses()
                 collector.writePauses(numberPause, pauseEnter);
                 return;
             }
-            if (downButton.Clicked())
+            if (upButton.Clicked())
             {
                 time1--;
                 if (!timeSet)
@@ -122,7 +127,7 @@ void TRM::enterTemperaturePauses()
                 lcd.ClearAll();
                 lcd.EnterTemperaturePause(pauseForLCD, i, true, temp1, time1, timeSet);
             }
-            if (upButton.Clicked())
+            if (downButton.Clicked())
             {
                 time1++;
                 if (!timeSet)
@@ -156,446 +161,461 @@ void TRM::enterTemperaturePauses()
     collector.writePauses(numberPause, pauseEnter);
 }
 
+void TRM::checkNumberProgButton()
+{
+    if (!numberButton.Clicked())
+    {
+        return;
+    }
+    numberPause++;
+    if (numberPause >= 7)
+    {
+        numberPause = 0;
+    }
+    byte number = numberPause;
+    number++;
+    lcd.mainMenu(getTemperature(), number, powerMax, powerMin, timeDelay, timeSet);
+}
+
 void TRM::settings()
 { // настройки 1-паузы, 2-вкл?выкл wifi, 3-параметры по мощности, 4-диапазон времени(сек/мин), 5- отложенное время
-    if (settingsButton.Clicked())
+    if (!settingsButton.Clicked())
     {
-        int whatMenu = 0;
-        whatMenu++;
-        lcd.ClearAll();
-        lcd.settingsMainMenu(whatMenu);
-        whatMenu--;
-        lcd.settingsMainMenu(whatMenu);
-        bool printSettings = false;
+        return;
+    }
+    int whatMenu = 0;
+    whatMenu++;
+    lcd.ClearAll();
+    lcd.settingsMainMenu(whatMenu);
+    whatMenu--;
+    lcd.settingsMainMenu(whatMenu);
+    bool printSettings = false;
 
-        while (1)
+    while (1)
+    {
+        if (printSettings)
         {
-            if (printSettings)
-            {
-                printSettings = false;
-                lcd.ClearAll();
-                lcd.settingsMainMenu(whatMenu);
-            }
-            if (settingsButton.Pressed())
-            {
-                lcd.ClearAll();
-                printMainMenu(0);
-                break;
-            }
+            printSettings = false;
+            lcd.ClearAll();
+            lcd.settingsMainMenu(whatMenu);
+        }
+        if (settingsButton.Clicked())
+        {
+            lcd.ClearAll();
+            printMainMenu(0);
+            break;
+        }
 
-            if (upButton.Clicked())
+        if (upButton.Clicked())
+        {
+            whatMenu++;
+            // whatMenu = constrain(whatMenu, 0, 3);
+            if (whatMenu >= 4)
             {
-                whatMenu++;
-                // whatMenu = constrain(whatMenu, 0, 3);
-                if (whatMenu >= 4)
-                {
-                    whatMenu = 0;
-                }
-                lcd.ClearAll();
-                lcd.settingsMainMenu(whatMenu);
-            } // Перемещение кнопками up down
-            if (downButton.Clicked())
-            {
-                whatMenu--;
-                // whatMenu = constrain(whatMenu, 0, 3);
-                if (whatMenu < 0 || whatMenu >= 4)
-                {
-                    whatMenu = 3;
-                }
-                lcd.ClearAll();
-                lcd.settingsMainMenu(whatMenu);
+                whatMenu = 0;
             }
-            if (startStopButton.Clicked())
+            lcd.ClearAll();
+            lcd.settingsMainMenu(whatMenu);
+        } // Перемещение кнопками up down
+        if (downButton.Clicked())
+        {
+            whatMenu--;
+            // whatMenu = constrain(whatMenu, 0, 3);
+            if (whatMenu < 0 || whatMenu >= 4)
             {
-                switch (whatMenu)
-                {
-                case 0: // Настройки паузы (ok)
-                {
-                    printSettings = true;
-                    MyButton *numberButton = new MyButton(_numberButton);
-                    lcd.ClearAll();
-                    byte numberForLCD = numberPause;
-                    numberForLCD++;
-                    lcd.NumberProg(numberForLCD);
-                    while (1)
-                    { // сначала выбираем номер паузы, затем вводим паузу
-                        if (settingsButton.Clicked())
+                whatMenu = 3;
+            }
+            lcd.ClearAll();
+            lcd.settingsMainMenu(whatMenu);
+        }
+        if (startStopButton.Clicked())
+        {
+            switch (whatMenu)
+            {
+            case 0: // Настройки паузы (ok)
+            {
+                printSettings = true;
+                lcd.ClearAll();
+                byte numberForLCD = numberPause;
+                numberForLCD++;
+                lcd.NumberProg(numberForLCD);
+                while (1)
+                { // сначала выбираем номер паузы, затем вводим паузу
+                    if (settingsButton.Clicked())
+                    {
+                        break;
+                    }
+                    if (numberButton.Clicked())
+                    {
+                        numberPause++;
+                        if (numberPause >= 7)
                         {
-                            break;
+                            numberPause = 0;
                         }
-                        if (numberButton->Clicked())
+                        byte numberForLCD = numberPause;
+                        numberForLCD++;
+                        lcd.NumberProg(numberForLCD);
+                    }
+                    if (startStopButton.Clicked())
+                    {
+                        enterTemperaturePauses();
+                        break;
+                    }
+                }
+            }
+            break;
+            case 1: // тюн и базовые
+            {
+                printSettings = true;
+                byte parametrChoice = 1;
+                lcd.ClearAll();
+                lcd.TuneBaseSettings(parametrChoice);
+                while (1)
+                {
+                    if (settingsButton.Clicked())
+                    {
+                        break;
+                    }
+                    if (upButton.Clicked())
+                    {
+                        parametrChoice++;
+                        if (parametrChoice >= 5)
                         {
-                            numberPause++;
-                            if (numberPause >= 7)
+                            parametrChoice = 1;
+                        }
+                        lcd.ClearAll();
+                        lcd.TuneBaseSettings(parametrChoice);
+                    }
+                    if (downButton.Clicked())
+                    {
+                        parametrChoice--;
+                        if (parametrChoice == 0)
+                        {
+                            parametrChoice = 4;
+                        }
+                        lcd.ClearAll();
+                        lcd.TuneBaseSettings(parametrChoice);
+                    }
+                    if (startStopButton.Clicked())
+                    {
+                        bool yes_no = false;
+                        lcd.ClearAll();
+                        if (parametrChoice < 3)
+                            lcd.TuneBaseSettings(parametrChoice, yes_no);
+                        else if (parametrChoice == 3)
+                            lcd.TuneBaseSettings(parametrChoice, calib_value);
+                        else
+                            lcd.TuneBaseSettings(parametrChoice, oper_mode);
+                        while (1 && parametrChoice < 3)
+                        {
+                            if (settingsButton.Clicked())
                             {
-                                numberPause = 0;
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice);
+                                break;
                             }
-                            byte numberForLCD = numberPause;
-                            numberForLCD++;
-                            lcd.NumberProg(numberForLCD);
+                            if (startStopButton.Clicked())
+                            {
+                                if (!yes_no)
+                                {
+                                    lcd.ClearAll();
+                                    lcd.TuneBaseSettings(parametrChoice);
+                                    break;
+                                }
+                                else if (yes_no && parametrChoice == 2)
+                                { // т.н
+                                    tuningPID();
+                                    break;
+                                }
+                                else if (yes_no && parametrChoice == 1)
+                                {
+                                    baseParametrs();
+                                }
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice);
+                                break;
+                            }
+                            if (upButton.Clicked() || downButton.Clicked())
+                            {
+                                if (yes_no)
+                                {
+                                    yes_no = false;
+                                }
+                                else
+                                {
+                                    yes_no = true;
+                                }
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice, yes_no);
+                            }
                         }
-                        if (startStopButton.Clicked())
+                        while (1 && parametrChoice == 3)
                         {
-                            enterTemperaturePauses();
-                            break;
+                            if (settingsButton.Clicked() || startStopButton.Clicked())
+                            {
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice);
+                                break;
+                            }
+                            if (upButton.Clicked())
+                            {
+                                calib_value++;
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice, calib_value);
+                            }
+                            if (downButton.Clicked())
+                            {
+                                calib_value--;
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice, calib_value);
+                            }
+                        }
+                        while (1 && parametrChoice == 4)
+                        {
+                            if (settingsButton.Clicked() || startStopButton.Clicked())
+                            {
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice);
+                                break;
+                            }
+                            if (upButton.Clicked() || downButton.Clicked())
+                            {
+                                if (oper_mode)
+                                    oper_mode = false;
+                                else
+                                    oper_mode = true;
+                                lcd.ClearAll();
+                                lcd.TuneBaseSettings(parametrChoice, oper_mode);
+                            }
                         }
                     }
-                    delete numberButton;
                 }
                 break;
-                case 1: // тюн и базовые
+            }
+            break;
+            case 2: // параметры по мощности (ok)
+            {
+                printSettings = true;
+                byte parametr = 1;
+                lcd.ClearAll();
+                lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+
+                while (1)
                 {
-                    printSettings = true;
-                    byte parametrChoice = 1;
-                    lcd.ClearAll();
-                    lcd.TuneBaseSettings(parametrChoice);
-                    while (1)
+                    if (settingsButton.Clicked())
                     {
-                        if (settingsButton.Clicked())
+                        break;
+                    }
+                    if (upButton.Clicked())
+                    {
+                        parametr++;
+                        if (parametr >= 5)
                         {
-                            break;
+                            parametr = 1;
                         }
-                        if (upButton.Clicked())
+                        lcd.ClearAll();
+                        lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                    }
+                    if (downButton.Clicked())
+                    {
+                        parametr--;
+                        if (parametr == 0)
                         {
-                            parametrChoice++;
-                            if (parametrChoice >= 5)
-                            {
-                                parametrChoice = 1;
-                            }
-                            lcd.ClearAll();
-                            lcd.TuneBaseSettings(parametrChoice);
+                            parametr = 3;
                         }
-                        if (downButton.Clicked())
+                        lcd.ClearAll();
+                        lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                    }
+                    if (startStopButton.Clicked())
+                    {
+                        lcd.ClearAll();
+                        if (parametr == 1)
                         {
-                            parametrChoice--;
-                            if (parametrChoice == 0)
-                            {
-                                parametrChoice = 4;
-                            }
-                            lcd.ClearAll();
-                            lcd.TuneBaseSettings(parametrChoice);
+                            lcd.PrintLimitMenu(parametr, powerMin);
                         }
-                        if (startStopButton.Clicked())
+                        else if (parametr == 2)
                         {
-                            bool yes_no = false;
-                            lcd.ClearAll();
-                            if (parametrChoice < 3)
-                                lcd.TuneBaseSettings(parametrChoice, yes_no);
-                            else if (parametrChoice == 3)
-                                lcd.TuneBaseSettings(parametrChoice, calib_value);
-                            else
-                                lcd.TuneBaseSettings(parametrChoice, oper_mode);
-                            while (1 && parametrChoice < 3)
+                            lcd.PrintLimitMenu(parametr, powerMax);
+                        }
+                        else
+                        {
+                            lcd.PrintLimitMenu(parametr, predel_temperature);
+                        }
+
+                        while (1 && parametr != 3)
+                        {
+                            if (settingsButton.Clicked() || startStopButton.Clicked())
                             {
-                                if (settingsButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice);
-                                    break;
-                                }
-                                if (startStopButton.Clicked())
-                                {
-                                    if (!yes_no)
-                                    {
-                                        lcd.ClearAll();
-                                        lcd.TuneBaseSettings(parametrChoice);
-                                        break;
-                                    }
-                                    else if (yes_no && parametrChoice == 2)
-                                    { // т.н
-                                        tuningPID();
-                                        break;
-                                    }
-                                    else if (yes_no && parametrChoice == 1)
-                                    {
-                                        baseParametrs();
-                                    }
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice);
-                                    break;
-                                }
-                                if (upButton.Clicked() || downButton.Clicked())
-                                {
-                                    if (yes_no)
-                                    {
-                                        yes_no = false;
-                                    }
-                                    else
-                                    {
-                                        yes_no = true;
-                                    }
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice, yes_no);
-                                }
+                                lcd.ClearAll();
+                                lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                                regulator.setLimits(powerMin, powerMax);
+                                break;
                             }
-                            while (1 && parametrChoice == 3)
+                            if (parametr == 1)
                             {
-                                if (settingsButton.Clicked() || startStopButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice);
-                                    break;
-                                }
                                 if (upButton.Clicked())
                                 {
-                                    calib_value += 0.25;
+                                    powerMin++;
+                                    if (powerMin > 100)
+                                    {
+                                        powerMin = 100;
+                                    }
                                     lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice, calib_value);
+                                    lcd.PrintLimitMenu(parametr, powerMin);
                                 }
                                 if (downButton.Clicked())
                                 {
-                                    calib_value -= 0.25;
+                                    powerMin--;
+                                    if (powerMin == 255)
+                                    {
+                                        powerMin = 0;
+                                    }
                                     lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice, calib_value);
+                                    lcd.PrintLimitMenu(parametr, powerMin);
                                 }
-                            }
-                            while (1 && parametrChoice == 4)
-                            {
-                                if (settingsButton.Clicked() || startStopButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice);
-                                    break;
-                                }
-                                if (upButton.Clicked() || downButton.Clicked())
-                                {
-                                    if (oper_mode)
-                                        oper_mode = false;
-                                    else
-                                        oper_mode = true;
-                                    lcd.ClearAll();
-                                    lcd.TuneBaseSettings(parametrChoice, oper_mode);
-                                }
-                            }
-                            Serial.println(oper_mode);
-                        }
-                    }
-                    break;
-                }
-                break;
-                case 2: // параметры по мощности (ok)
-                {
-                    printSettings = true;
-                    byte parametr = 1;
-                    lcd.ClearAll();
-                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
-
-                    while (1)
-                    {
-                        if (settingsButton.Clicked())
-                        {
-                            break;
-                        }
-                        if (upButton.Clicked())
-                        {
-                            parametr++;
-                            if (parametr >= 5)
-                            {
-                                parametr = 1;
-                            }
-                            lcd.ClearAll();
-                            lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
-                        }
-                        if (downButton.Clicked())
-                        {
-                            parametr--;
-                            if (parametr == 0)
-                            {
-                                parametr = 3;
-                            }
-                            lcd.ClearAll();
-                            lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
-                        }
-                        if (startStopButton.Clicked())
-                        {
-                            lcd.ClearAll();
-                            if (parametr == 1)
-                            {
-                                lcd.PrintLimitMenu(parametr, powerMin);
                             }
                             else if (parametr == 2)
                             {
-                                lcd.PrintLimitMenu(parametr, powerMax);
-                            }
-                            else
-                            {
-                                lcd.PrintLimitMenu(parametr, predel_temperature);
-                            }
-
-                            while (1 && parametr != 3)
-                            {
-                                if (settingsButton.Clicked() || startStopButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
-                                    regulator.setLimits(powerMin, powerMax);
-                                    break;
-                                }
-                                if (parametr == 1)
-                                {
-                                    if (upButton.Clicked())
-                                    {
-                                        powerMin++;
-                                        if (powerMin > 100)
-                                        {
-                                            powerMin = 100;
-                                        }
-                                        lcd.ClearAll();
-                                        lcd.PrintLimitMenu(parametr, powerMin);
-                                    }
-                                    if (downButton.Clicked())
-                                    {
-                                        powerMin--;
-                                        if (powerMin == 255)
-                                        {
-                                            powerMin = 0;
-                                        }
-                                        lcd.ClearAll();
-                                        lcd.PrintLimitMenu(parametr, powerMin);
-                                    }
-                                }
-                                else if (parametr == 2)
-                                {
-                                    if (upButton.Clicked())
-                                    {
-                                        powerMax++;
-                                        if (powerMax > 100)
-                                        {
-                                            powerMax = 100;
-                                        }
-                                        lcd.ClearAll();
-                                        lcd.PrintLimitMenu(parametr, powerMax);
-                                    }
-                                    if (downButton.Clicked())
-                                    {
-                                        powerMax--;
-                                        if (powerMax == 255)
-                                        {
-                                            powerMax = 0;
-                                        }
-                                        lcd.ClearAll();
-                                        lcd.PrintLimitMenu(parametr, powerMax);
-                                    }
-                                }
-                            }
-                            while (1 && parametr == 3)
-                            {
-                                if (settingsButton.Clicked() || startStopButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
-                                    break;
-                                }
                                 if (upButton.Clicked())
                                 {
-                                    predel_temperature++;
+                                    powerMax++;
+                                    if (powerMax > 100)
+                                    {
+                                        powerMax = 100;
+                                    }
                                     lcd.ClearAll();
-                                    lcd.PrintLimitMenu(parametr, predel_temperature);
+                                    lcd.PrintLimitMenu(parametr, powerMax);
                                 }
                                 if (downButton.Clicked())
                                 {
-                                    predel_temperature--;
+                                    powerMax--;
+                                    if (powerMax == 255)
+                                    {
+                                        powerMax = 0;
+                                    }
                                     lcd.ClearAll();
-                                    lcd.PrintLimitMenu(parametr, predel_temperature);
+                                    lcd.PrintLimitMenu(parametr, powerMax);
                                 }
                             }
                         }
+                        while (1 && parametr == 3)
+                        {
+                            if (settingsButton.Clicked() || startStopButton.Clicked())
+                            {
+                                lcd.ClearAll();
+                                lcd.PowerLimits(parametr, powerMin, powerMax, predel_temperature);
+                                break;
+                            }
+                            if (upButton.Clicked())
+                            {
+                                predel_temperature++;
+                                lcd.ClearAll();
+                                lcd.PrintLimitMenu(parametr, predel_temperature);
+                            }
+                            if (downButton.Clicked())
+                            {
+                                predel_temperature--;
+                                lcd.ClearAll();
+                                lcd.PrintLimitMenu(parametr, predel_temperature);
+                            }
+                        }
                     }
-                    lcd.ClearAll();
-                    lcd.settingsMainMenu(2);
                 }
-                break;
-                case 3: // выбор времени sec/min (ok!)
+                lcd.ClearAll();
+                lcd.settingsMainMenu(2);
+            }
+            break;
+            case 3: // выбор времени sec/min (ok!)
+            {
+                printSettings = true;
+                bool parametrTime = true;
+                lcd.ClearAll();
+                lcd.TimeSettings(parametrTime);
+                while (1)
                 {
-                    printSettings = true;
-                    bool parametrTime = true;
-                    lcd.ClearAll();
-                    lcd.TimeSettings(parametrTime);
-                    while (1)
+                    if (settingsButton.Clicked())
                     {
-                        if (settingsButton.Clicked())
+                        break;
+                    }
+                    if (upButton.Clicked() || downButton.Clicked())
+                    {
+                        if (parametrTime)
                         {
-                            break;
+                            parametrTime = false;
                         }
-                        if (upButton.Clicked() || downButton.Clicked())
+                        else
                         {
-                            if (parametrTime)
-                            {
-                                parametrTime = false;
-                            }
-                            else
-                            {
-                                parametrTime = true;
-                            }
-                            lcd.ClearAll();
-                            lcd.TimeSettings(parametrTime);
+                            parametrTime = true;
                         }
-                        if (startStopButton.Clicked())
+                        lcd.ClearAll();
+                        lcd.TimeSettings(parametrTime);
+                    }
+                    if (startStopButton.Clicked())
+                    {
+                        lcd.ClearAll();
+                        if (parametrTime)
                         {
-                            lcd.ClearAll();
-                            if (parametrTime)
+                            lcd.TimeConcrete(parametrTime, timeSet);
+                        }
+                        else
+                        {
+                            lcd.TimeConcrete(parametrTime, timeDelay);
+                        }
+                        while (1)
+                        {
+                            if (settingsButton.Clicked() || startStopButton.Clicked())
                             {
+                                lcd.ClearAll();
+                                lcd.TimeSettings(parametrTime);
+                                break;
+                            }
+                            if ((upButton.Clicked() || downButton.Clicked()) && parametrTime)
+                            {
+                                if (timeSet)
+                                {
+                                    timeSet = false;
+                                }
+                                else
+                                {
+                                    timeSet = true;
+                                }
+                                lcd.ClearAll();
                                 lcd.TimeConcrete(parametrTime, timeSet);
                             }
-                            else
+                            else if ((upButton.Clicked() || downButton.Clicked()) && !parametrTime)
                             {
+                                if (timeDelay)
+                                {
+                                    timeDelay = false;
+                                }
+                                else
+                                {
+                                    timeDelay = true;
+                                }
+                                lcd.ClearAll();
                                 lcd.TimeConcrete(parametrTime, timeDelay);
-                            }
-                            while (1)
-                            {
-                                if (settingsButton.Clicked() || startStopButton.Clicked())
-                                {
-                                    lcd.ClearAll();
-                                    lcd.TimeSettings(parametrTime);
-                                    break;
-                                }
-                                if ((upButton.Clicked() || downButton.Clicked()) && parametrTime)
-                                {
-                                    if (timeSet)
-                                    {
-                                        timeSet = false;
-                                    }
-                                    else
-                                    {
-                                        timeSet = true;
-                                    }
-                                    lcd.ClearAll();
-                                    lcd.TimeConcrete(parametrTime, timeSet);
-                                }
-                                else if ((upButton.Clicked() || downButton.Clicked()) && !parametrTime)
-                                {
-                                    if (timeDelay)
-                                    {
-                                        timeDelay = false;
-                                    }
-                                    else
-                                    {
-                                        timeDelay = true;
-                                    }
-                                    lcd.ClearAll();
-                                    lcd.TimeConcrete(parametrTime, timeDelay);
-                                }
                             }
                         }
                     }
-                    runner.putTimeSettings(timeSet, timeDelay);
-                    // надо сохранить в EEprom
                 }
+                runner.putTimeSettings(timeSet, timeDelay);
+                // надо сохранить в EEprom
+            }
+            break;
+            default:
                 break;
-                default:
-                    break;
-                }
             }
         }
-        saveParametrs();
-        termoCouple.Calibration(calib_value);
-        lcd.ClearAll();
     }
+    saveParametrs();
+    termoCouple.Calibration(calib_value);
+    lcd.ClearAll();
 }
 
 void TRM::startProgramm()
 {
-    if (startStopButton.Clicked() && !oper_mode)
+    if(oper_mode){return;}
+    if (startStopButton.Clicked())
     {
         if (runner.is_programm_run())
         {
@@ -621,6 +641,7 @@ void TRM::main_programm()
     settings();
     // motorOn();
     startProgramm();
+    checkNumberProgButton();
     if (runner.is_programm_run())
     {
         runningProgramm();
@@ -694,17 +715,18 @@ void TRM::tunningProgramm()
     lcd.TuningProcces(regulator.GetParametrsLCD().second(), termoCouple.ReadCelsius());
 }
 
-void TRM::printMainMenu(const int &temperatureNew)
+void TRM::printMainMenu(const float &temperatureNew)
 {
-    static int temp;
-    if (temp != temperatureNew)
+    static float temp;
+    if (temp == temperatureNew)
     {
-        temp = temperatureNew;
-        byte pause = getNumberPause() + 1;
-        // lcd.ClearAll();
-        //  lcd.mainMenu(temp, pause);
-        lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet); // для отладки
+        return;
     }
+    temp = temperatureNew;
+    byte pause = getNumberPause() + 1;
+    // lcd.ClearAll();
+    //  lcd.mainMenu(temp, pause);
+    lcd.mainMenu(temp, pause, powerMax, powerMin, timeDelay, timeSet); // для отладки
 }
 
 byte TRM::getPIDvalue()
@@ -813,6 +835,7 @@ void TRM::baseParametrs()
 
 void TRM::start_program_from_server(const bool &start)
 {
+    if(oper_mode){return;}
     if (start && !runner.is_programm_run())
     {
         lcd.ClearAll();
@@ -824,6 +847,7 @@ void TRM::start_program_from_server(const bool &start)
 }
 void TRM::stop_program_from_server(const bool &stop)
 {
+    if(oper_mode){return;}
     if (stop && runner.is_programm_run())
     {
         lcd.ClearAll();
@@ -892,7 +916,8 @@ void TRM::save_parametrs_power(const byte &what, const byte &value)
 
 void TRM::enterMode(const bool &mode)
 {
-    if(oper_mode != mode){
+    if (oper_mode != mode)
+    {
         oper_mode = mode;
     }
     if (!mode)
@@ -901,6 +926,7 @@ void TRM::enterMode(const bool &mode)
     }
 }
 
-void TRM::enterPowerValueNow(const byte& value){
-    power = constrain(value, 0, 100);
+void TRM::enterPowerValueNow(const int &value)
+{
+    power = value;
 }

@@ -21,17 +21,17 @@ bool wifiOn = false;
 
 uint32_t timer = millis();
 
-const byte input_pin = 25;
-const byte output_pin = 26;
+const byte input_pin = 32;
+const byte output_pin = 33;
 const byte upButton = 23;
 const byte downButton = 19;
 const byte settingsButtn = 18;
 const byte startButton = 5;
 const byte mtrButton = 16;
 const byte numberButton = 17;
-const byte sck = 12;
-const byte cs = 14;
-const byte so = 27;
+const byte sck = 27;
+const byte cs = 26;
+const byte so = 25;
 const byte mtrRelay = 14;
 
 TRM trm{downButton, upButton, settingsButtn, startButton, numberButton, mtrButton, mtrRelay, sck, cs, so};
@@ -51,7 +51,7 @@ void setup()
     digitalWrite(output_pin, LOW);
 
     trm.ini();
-
+    
     thing["temperature"] >> [](pson &out)
     {
         out = trm.getTemperature();
@@ -84,7 +84,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = trm.getParametrs().first();
+            in = trm.getTimeSet();
         }
         trm.save_parametrs_time(1, in);
     };
@@ -92,7 +92,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = !trm.getParametrs().second();
+            in = !trm.getTimeDelay();
         }
         trm.save_parametrs_time(2, !in);
     };
@@ -100,7 +100,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = trm.getParametrs().third();
+            in = trm.getPowerMax();
         }
         trm.save_parametrs_power(3, in);
     };
@@ -108,7 +108,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            in = trm.getParametrs().fouth();
+            in = trm.getPowerMin();
         }
         trm.save_parametrs_power(4, in);
     };
@@ -140,7 +140,7 @@ void setup()
     {
         if (in.is_empty())
         {
-            trm.getPowerValueNow();
+            in = trm.getPowerValueNow();
         }
         trm.enterPowerValueNow(in);
     };
@@ -149,6 +149,12 @@ void setup()
         out["timeOutput"] = out_val.second();
         out["tempOutput"] = out_val.first();
         out["numberPauseOutput"] = out_val.third();
+    };
+    thing["ParametrsShow"] >> [](pson & out){
+        out["CalibrShow"] = trm.getCalibrationValue();
+        out["PowerMaxShow"] = trm.getPowerMax();
+        out["PowerMinShow"] = trm.getPowerMin();
+        out["PredelTempShow"] = trm.getPredelTemperature();
     };
 }
 
@@ -183,7 +189,9 @@ void dimmer(const byte &pidValue)
     }
     if (high_low && (millis() - timer >= a))
     {
-        digitalWrite(output_pin, LOW);
+        if(b != 0){
+            digitalWrite(output_pin, LOW);
+        }
         timer = millis();
         high_low = false;
     }
@@ -240,7 +248,7 @@ bool wifiManager()
 {
     WiFi.mode(WIFI_STA);
     WiFiManager wifiManager;
-    // wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
+    //wifiManager.resetSettings();          // перезапись имени wifi каждый запуск
     bool res;                             // храним переменную для подключения
     res = wifiManager.autoConnect("PVK"); // подключение телефона к точке
     return res;

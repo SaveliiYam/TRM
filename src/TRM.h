@@ -28,13 +28,13 @@
 class TRM
 {
 private:
-    byte _upButton, _downButton, _numberButton, _motorPin, numberPause = 0;
+    byte _upButton, _downButton, _motorPin, numberPause = 0;
     byte powerMax = 0, powerMin = 0; // переменные, связанные с макс и мин мощностями, должны загружаться из EEprom
     byte predel_temperature = 101;
 
     ProgrammRunner runner;
     TemperaturePauseCollector collector;
-    MyButton settingsButton, startStopButton, motorButton, upButton, downButton;
+    MyButton settingsButton, startStopButton, motorButton, upButton, downButton, numberButton;
     MyThermoCouple termoCouple;
 
     bool timeSet = false;   // переменная связанная со временем, она должна загружаться из EEprom (false == min)
@@ -46,7 +46,7 @@ private:
     byte number_pause_for_th = 0;
     uint32_t set_time_for_th = 0;
 
-    float calib_value = 0;
+    int calib_value = 0;
 
     LCD lcd;
     PIDRegulator regulator;
@@ -58,13 +58,14 @@ private:
     void runningProgramm();
     void poweringProgramm();
     void tunningProgramm();
-    void printMainMenu(const int &temperatureNew);
+    void printMainMenu(const float &temperatureNew);
     void WiFiConnect(); // Подключение к wifi
     void saveParametrs();
     void loadParametrs();
     void baseParametrs();
     void chooseNumberPause();
     void tuningPID();
+    void checkNumberProgButton();
 
 public:
     TRM(const byte &dwnBtn, const byte &upBtn, const byte &setBtn, const byte &strtBtn,
@@ -75,22 +76,26 @@ public:
     byte getPIDvalue();
     byte getPIDvalueTune() const;
     float getTemperature();
-    float getCalibrationValue() const;
-    void enterCalibrationValue(const float &value);
+    int getCalibrationValue() const;
+    void enterCalibrationValue(const int &value);
     byte getPredelTemperature() const;
     void enterPredelTemperature(const byte &predel);
 
     // серверная часть
-    byte get_number_prog() const { return numberPause; }
+    const int get_number_prog() const { return numberPause; }
     void start_program_from_server(const bool &start);
     void stop_program_from_server(const bool &stop);
     void put_number_prog(const byte &number);
-    Fouth<bool, bool, byte, byte> getParametrs() const { return Fouth<bool, bool, byte, byte>(timeSet, timeDelay, powerMax, powerMin); }
+    const Fouth<bool, bool, int, int> getParametrs() const { return Fouth<bool, bool, int, int>(timeSet, timeDelay, powerMax, powerMin); }
+    const bool getTimeSet() const {return timeSet;}
+    const bool getTimeDelay() const {return timeDelay;}
+    const int getPowerMax() const {return powerMax;}
+    const int getPowerMin() const {return powerMin;}
     void save_parametrs_time(const byte &what, const bool &value);
     void save_parametrs_power(const byte &what, const byte &value);
     bool getMode() const{return oper_mode;}
     void enterMode(const bool& mode);
-    byte getPowerValueNow()const {return power;}
-    void enterPowerValueNow(const byte& value);
-    Third<byte, uint32_t, byte> getOutputTimeTem() const{return Third<byte, uint32_t, byte>{set_temp_for_th, set_time_for_th, number_pause_for_th};}
+    const int getPowerValueNow()const {return power;}
+    void enterPowerValueNow(const int& value);
+    const Third<byte, uint32_t, byte> getOutputTimeTem() const{return Third<byte, uint32_t, byte>{set_temp_for_th, set_time_for_th, number_pause_for_th};}
 };

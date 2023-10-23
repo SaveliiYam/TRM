@@ -1,0 +1,5 @@
+{
+    "configuration": "FlashFreq=80,PartitionScheme=default,UploadSpeed=921600,DebugLevel=none,EraseFlash=none",
+    "board": "esp32:esp32:mhetesp32devkit",
+    "port": "/dev/ttyUSB0"
+}

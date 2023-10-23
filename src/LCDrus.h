@@ -50,7 +50,7 @@ public:
     void workProgramm(const int &setpointTemperature, const float &temperature, const byte &numberPause, const uint32_t &time, const bool& timeParametr);
     void TuneBaseSettings(const byte &parametr);
     void TuneBaseSettings(const byte &parametr, const bool &choise);
-    void TuneBaseSettings(const byte &parametr, const float &calib);
+    void TuneBaseSettings(const byte &parametr, const int &calib);
     void Tuning(const byte &temperatureMax);
     void TuningProcces(const byte &percent, const byte &temperatureNow);
     void SuccessConection(const bool& status);
